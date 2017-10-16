@@ -37,7 +37,7 @@ class block_sibcms extends block_list {
 		$this->content->icons = array();
 		$this->content->footer = '';
 		 
-		$this->content->items[] = html_writer::tag('a', get_string('key1', 'block_sibcms'), array('href' => $CFG->wwwroot.'/blocks/sibcms/categories.php'));
+		$this->content->items[] = html_writer::tag('a', get_string('key1', 'block_sibcms'), array('href' => $CFG->wwwroot.'/blocks/sibcms/category.php'));
 		//$this->content->icons[] = html_writer::empty_tag('img', array('src' => $CFG->wwwroot.'/blocks/sibportfolio/pix/sibport.png'));
 				 
 		return $this->content;
