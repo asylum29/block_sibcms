@@ -2,37 +2,52 @@
 
 namespace block_sibcms;
 
-require_once($CFG->dirroot.'/mod/assign/locallib.php');
-require_once($CFG->dirroot.'/mod/quiz/locallib.php');
+require_once($CFG->dirroot . '/mod/assign/locallib.php');
+require_once($CFG->dirroot . '/mod/quiz/locallib.php');
 
-class sibcms_api {
+class sibcms_api
+{
 
-    public static function get_couse_feedbacks($courseid) {
+    /**
+     * Get all course feedbacks
+     * @param $course_id
+     * @return array
+     */
+    public static function get_course_feedbacks($course_id)
+    {
         global $DB;
-
-        $feedbacks = $DB->get_records('block_sibcms_feedbacks', array('courseid' => $courseid));
-
-        return $feedbacks;
+        return $DB->get_records('block_sibcms_feedbacks', array('courseid' => $course_id));
     }
 
-    public static function get_last_course_feedback($courseid) {
+    /**
+     * Get last course feedback
+     * @param $course_id
+     * @return mixed
+     */
+    public static function get_last_course_feedback($course_id)
+    {
         global $DB;
-
         $sql = 'SELECT *
-                FROM {block_sibcms_feedbacks}
-                WHERE courseid = ?
-                ORDER BY timecreated DESC';
-        $feedback = $DB->get_record_sql($sql, array($courseid));
-
-        return $feedback;
-
+                  FROM {block_sibcms_feedbacks}
+                 WHERE courseid = ?
+              ORDER BY timecreated DESC';
+        return $DB->get_record_sql($sql, array($course_id));
     }
 
-    public static function save_feedback($courseid, $feedback, $comment, $result) {
+    /**
+     * Save feedback for the course
+     * @param $course_id
+     * @param $feedback
+     * @param $comment
+     * @param $result
+     * @return bool|int
+     */
+    public static function save_feedback($course_id, $feedback, $comment, $result)
+    {
         global $DB, $USER;
         $record = new \stdClass();
         $record->userid = $USER->id;
-        $record->courseid = $courseid;
+        $record->courseid = $course_id;
         $record->timecreated = time();
         $record->result = $result;
         $record->feedback = $feedback;
@@ -40,66 +55,79 @@ class sibcms_api {
         return $DB->insert_record('block_sibcms_feedbacks', $record);
     }
 
-    public static function need_attention($courseid) {
-        $lastfeedback = sibcms_api::get_last_course_feedback($courseid);
-        //Если нет отзыва
-        if (!$lastfeedback) {
+    /**
+     * Check if course require attention
+     * @param $course_id
+     * @return bool
+     */
+    public static function require_attention($course_id)
+    {
+        $last_feedback = sibcms_api::get_last_course_feedback($course_id);
+        // Course has no feedback
+        if (!$last_feedback) {
             return true;
         }
-        //Если курс без замечаний - 15 дней
-        if ($lastfeedback->result == 0 && time() - $lastfeedback->timecreated > 3600 * 24 * 15) {
+        // Course has no errors - 15 day
+        if ($last_feedback->result == 0 && time() - $last_feedback->timecreated > 3600 * 24 * 15) {
             return true;
         }
-        //Если курс с незначительными замечаниями - 7 дней
-        if ($lastfeedback->result == 1 && time() - $lastfeedback->timecreated > 3600 * 24 * 7) {
+        // Course has not critical errors - 7 days
+        if ($last_feedback->result == 1 && time() - $last_feedback->timecreated > 3600 * 24 * 7) {
             return true;
         }
-        //Если курс с критическими замечаниями - 3 дня
-        if ($lastfeedback->result == 2 && time() - $lastfeedback->timecreated > 3600 * 24 * 3) {
+        // Course has critical errors - 3 days
+        if ($last_feedback->result == 2 && time() - $last_feedback->timecreated > 3600 * 24 * 3) {
             return true;
         }
-        //Если курс не готов - 3 дня
-        if ($lastfeedback->result == 3 && time() - $lastfeedback->timecreated > 3600 * 24 * 3) {
+        // Course is empty - 3 days
+        if ($last_feedback->result == 3 && time() - $last_feedback->timecreated > 3600 * 24 * 3) {
             return true;
         }
         return false;
     }
 
-    public static function get_autohints($coursedata) {
+    /**
+     * Get all automatic hints for course data
+     * @param $course_data
+     * @return array
+     */
+    public static function get_hints($course_data)
+    {
         $hints = array();
-        if (count($coursedata->graders) == 0) {
+        if (count($course_data->graders) == 0) {
             $hints[] = get_string('key50', 'block_sibcms');
         }
-        if (count($coursedata->graders) == $coursedata->participants) {
+        if (count($course_data->graders) == $course_data->participants) {
             $hints[] = get_string('key51', 'block_sibcms');
         }
-        if ($coursedata->filescount == 0) {
+        if ($course_data->filescount == 0) {
             $hints[] = get_string('key52', 'block_sibcms');
         }
-        if (count($coursedata->assigns) + count($coursedata->quiz) == 0) {
+        if (count($course_data->assigns) + count($course_data->quiz) == 0) {
             $hints[] = get_string('key53', 'block_sibcms');
         }
 
-        $allgrading = true;
-        foreach ($coursedata->assigns as $assign) {
-            $allgrading &= !$assign->nograde;
+        $all_assings_is_grading = true;
+        foreach ($course_data->assigns as $assign) {
+            $all_assings_is_grading &= !$assign->nograde;
         }
-        if (!$allgrading) {
+        if (!$all_assings_is_grading) {
             $hints[] = get_string('key54', 'block_sibcms');
         }
 
-        $hasquestions = true;
-        foreach ($coursedata->quiz as $quiz) {
-            $hasquestions &= !$quiz->noquestions;
+        $all_quiz_have_questions = true;
+        foreach ($course_data->quiz as $quiz) {
+            $all_quiz_have_questions &= !$quiz->noquestions;
         }
-        if (!$hasquestions) {
+        if (!$all_quiz_have_questions) {
             $hints[] = get_string('key55', 'block_sibcms');
         }
         return $hints;
     }
 
     // TODO: Union all graders and mark their capabilities
-    public static function get_course_graders($courseid, $fields = 'u.*') {
+    public static function get_course_graders($courseid, $fields = 'u.*')
+    {
         $context = \context_course::instance((int)$courseid);
         $graders = get_enrolled_users($context, 'mod/assign:grade', null, $fields, null, null, null, true);
         foreach ($graders as $grader) {
@@ -113,7 +141,13 @@ class sibcms_api {
         return $graders;
     }
 
-    public static function get_course_data($course) {
+    /**
+     * Get united course data
+     * @param $course
+     * @return \stdClass
+     */
+    public static function get_course_data($course)
+    {
         $modinfo = get_fast_modinfo($course->id);
         $result = new \stdClass();
         $result->id = $course->id;
@@ -127,12 +161,32 @@ class sibcms_api {
         return $result;
     }
 
-    public static function get_last_access_to_course($courseid, $userid) {
+    /**
+     * Get user's last access time to the course
+     * @param $course_id
+     * @param $user_id
+     * @return mixed
+     */
+    public static function get_last_access_to_course($course_id, $user_id)
+    {
         global $DB;
-        return $DB->get_field('user_lastaccess', 'timeaccess', array('courseid' => $courseid, 'userid' => $userid));
+        return $DB->get_field('user_lastaccess', 'timeaccess',
+            array(
+                'courseid' => $course_id,
+                'userid' => $user_id
+            )
+        );
     }
 
-    public static function get_assign_grades_data($modinfo, $activitygroup, $onlyvisible = false) {
+    /**
+     * Get assings data
+     * @param $modinfo
+     * @param $activitygroup
+     * @param bool $onlyvisible
+     * @return array
+     */
+    public static function get_assign_grades_data($modinfo, $activitygroup, $onlyvisible = false)
+    {
         global $DB;
 
         $modules = $modinfo->get_instances_of('assign');
@@ -193,8 +247,8 @@ class sibcms_api {
                 $where = "WHERE s.assignment = :assign AND s.timemodified IS NOT NULL AND (s.status = :stat1 OR s.status = :stat2) ";
                 $sparams = array(
                     'assign' => $module->instance,
-                    'stat1'  => ASSIGN_SUBMISSION_STATUS_SUBMITTED,
-                    'stat2'  => ASSIGN_SUBMISSION_STATUS_DRAFT
+                    'stat1' => ASSIGN_SUBMISSION_STATUS_SUBMITTED,
+                    'stat2' => ASSIGN_SUBMISSION_STATUS_DRAFT
                 );
                 $sparams = array_merge($sparams, $uparams);
                 $moddata->submitted = $DB->count_records_sql($select . $table . $ujoin . $where, $sparams);
@@ -213,7 +267,15 @@ class sibcms_api {
         return $result;
     }
 
-    public static function get_quiz_grades_data($modinfo, $activitygroup, $onlyvisible = false) {
+    /**
+     * Get quiz data
+     * @param $modinfo
+     * @param $activitygroup
+     * @param bool $onlyvisible
+     * @return array
+     */
+    public static function get_quiz_grades_data($modinfo, $activitygroup, $onlyvisible = false)
+    {
         global $DB;
 
         $modules = $modinfo->get_instances_of('quiz');
@@ -254,15 +316,28 @@ class sibcms_api {
         return $result;
     }
 
-    public static function get_count_course_participants($courseid) {
-        $context = \context_course::instance($courseid);
+    /**
+     * Get course participants count
+     * @param $courseid
+     * @return array
+     */
+    public static function get_count_course_participants($course_id)
+    {
+        $context = \context_course::instance($course_id);
         return count_enrolled_users($context);
     }
 
 
-    public static function get_count_course_files($courseid, $onlyvisible = false) {
+    /**
+     * Get course files count
+     * @param $courseid
+     * @param bool $onlyvisible
+     * @return int
+     */
+    public static function get_count_course_files($course_id, $onlyvisible = false)
+    {
         $result = 0;
-        $modinfo = get_fast_modinfo($courseid);
+        $modinfo = get_fast_modinfo($course_id);
 
         $modules = $modinfo->get_instances_of('resource');
         foreach ($modules as $module) {
@@ -274,31 +349,33 @@ class sibcms_api {
         foreach ($modules as $module) {
             if ($onlyvisible && !$module->visible) continue;
             $cm = \context_module::instance($module->id);
-            $files = $fs->get_area_files($cm->id, 'mod_folder', 'content', 0, null, false);
+            $files = $fs->get_area_files($cm->id, 'mod_folder',
+                'content', 0, null, false);
             $result += count($files);
         }
 
         return $result;
     }
 
-/*
-    public static function set_modvisible($module, $visible) {
-        global $DB;
+    /*
+        public static function set_modvisible($module, $visible) {
+            global $DB;
 
-        $count = $DB->count_records('report_activity_visibility', array('moduleid' => $module->id));
-        if ($count > 0) {
-            $DB->set_field('report_activity_visibility', 'visible', $visible, array('moduleid' => $module->id));
-        } else {
-            $DB->execute('INSERT INTO {report_activity_visibility} (courseid, moduleid, visible) VALUES (?, ?, ?)', array($module->course, $module->id, $visible));
+            $count = $DB->count_records('report_activity_visibility', array('moduleid' => $module->id));
+            if ($count > 0) {
+                $DB->set_field('report_activity_visibility', 'visible', $visible, array('moduleid' => $module->id));
+            } else {
+                $DB->execute('INSERT INTO {report_activity_visibility} (courseid, moduleid, visible) VALUES (?, ?, ?)', array($module->course, $module->id, $visible));
+            }
         }
-    }
 
-    public static function get_modvisible($module) {
-        global $DB;
+        public static function get_modvisible($module) {
+            global $DB;
 
-        $record = $DB->get_record('report_activity_visibility', array('moduleid' => $module->id));
+            $record = $DB->get_record('report_activity_visibility', array('moduleid' => $module->id));
 
-        return !$record ? $module->visible : $record->visible;
-    }
-*/
+            return !$record ? $module->visible : $record->visible;
+        }
+    */
+
 }
