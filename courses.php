@@ -4,20 +4,17 @@ require_once('../../config.php');
 require_once ('../../lib/coursecatlib.php');
 
 $category_id = required_param('category', PARAM_INT);
-$page = optional_param('page', 0,PARAM_INT);
+$page = optional_param('page', 0, PARAM_INT);
 
 $PAGE->set_url(new moodle_url('/blocks/sibcms/courses.php', array('category' => $category_id)));
 
 require_login(1);
 
 if (!is_siteadmin()) {
-    echo $OUTPUT->header();
-    echo get_string('key59', 'block_sibcms');
-    echo $OUTPUT->footer();
-    die();
+    print_error('key59', 'block_sibcms');
 }
 
-// Ссылка на кроень системы
+// Ссылка на корень системы
 $PAGE->navbar->add(get_string('key21', 'block_sibcms'), new moodle_url('/blocks/sibcms/category.php'));
 //$PAGE->navbar->add(get_course(1)->shortname, new moodle_url('/blocks/sibcms/category.php'));
 

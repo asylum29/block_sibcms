@@ -73,7 +73,7 @@ class renderer extends \plugin_renderer_base
                 if (!empty($feedback)) {
                     $time_ago = format_time(time() - $feedback->timecreated);
                 }
-                $status = '';
+                $status = '—';
                 if ($feedback) {
                     if ($feedback->result == 0) {
                         $status = \html_writer::span(get_string('key23', 'block_sibcms'), 'green');
@@ -98,14 +98,14 @@ class renderer extends \plugin_renderer_base
                     \html_writer::tag('a', get_string('key19', 'block_sibcms'),
                         array(
                             'href' => new \moodle_url('/blocks/sibcms/course.php',
-                                array('id' => $course->id, 'category' => $widget->category_id)),
-                            'class' => 'btn'
+                                array('id' => $course->id, 'category' => $widget->category_id))
                         )
                     )
                 );
             }
             $result .= \html_writer::table($table);
-            $result .= $OUTPUT->paging_bar($widget->courses_count, $widget->page, 20, new \moodle_url('/blocks/sibcms/courses.php', array('category' => $widget->category_id)));
+            $result .= $OUTPUT->paging_bar($widget->courses_count, $widget->page, 20,
+                new \moodle_url('/blocks/sibcms/courses.php', array('category' => $widget->category_id)));
         } else {
             $result .= $OUTPUT->heading(get_string('key6', 'block_sibcms'));
         }

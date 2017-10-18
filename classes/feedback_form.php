@@ -40,7 +40,7 @@ class feedback_form extends \moodleform
                 $grader_text = "$grader_link ($time_ago)";
                 $graders_str .= \html_writer::tag('li', $grader_text);
             }
-            $graders_str .= \html_writer::start_tag('ul');
+            $graders_str .= \html_writer::end_tag('ul');
             $mform->addElement('static', 'graders',
                 get_string('key28', 'block_sibcms'),
                 $graders_str
@@ -51,11 +51,7 @@ class feedback_form extends \moodleform
         $hints = sibcms_api::get_hints($course_data);
         $hints_str = '';
         if (count($hints)) {
-            $hints_str .= \html_writer::start_tag('ul');
-            foreach ($hints as $hint) {
-                $hints_str .= \html_writer::tag('li', $hint);
-            }
-            $hints_str .= \html_writer::start_tag('ul');
+            $hints_str = \html_writer::alist($hints);
         } else {
             $hints_str .= get_string('key58', 'block_sibcms');
         }
@@ -88,9 +84,9 @@ class feedback_form extends \moodleform
             $assign_table->size[7] = '15%';
             foreach ($assigns as $assign) {
                 $feedbacks = $assign->feedbacks;
-                $feedback_str = '';
+                $feedbacks_names = array();
                 foreach ($feedbacks as $feedback) {
-                    $feedback_str .= $feedback->get_name();
+                    $feedbacks_names[] = $feedback->get_name();
                 }
                 $submit_persent = ($assign->participants == 0) ?
                     '0%' :
@@ -106,7 +102,7 @@ class feedback_form extends \moodleform
                     $assign->graded,
                     $graded_persent,
                     $assign->grade,
-                    $feedback_str
+                    \html_writer::alist($feedbacks_names)
                 );
             }
             $assign_table_str = \html_writer::table($assign_table);
@@ -157,6 +153,7 @@ class feedback_form extends \moodleform
 
         $select = $mform->addElement('select', 'result', get_string('key33', 'block_sibcms'), $results, null);
         $mform->addRule('result', get_string('key30', 'block_sibcms'), 'numeric', null, 'server');
+        $mform->addRule('result', get_string('key30', 'block_sibcms'), 'required', null, 'server');
         $select->setMultiple(false);
 
         // Feedback textarea
@@ -171,7 +168,7 @@ class feedback_form extends \moodleform
 
     function validation($data, $files)
     {
-        $errors = array();
+        $errors = parent::validation($data, $files);
         return $errors;
     }
 

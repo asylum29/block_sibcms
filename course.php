@@ -3,6 +3,7 @@
 require_once('../../config.php');
 require_once('../../lib/coursecatlib.php');
 require_once("$CFG->libdir/formslib.php");
+
 $course_id = required_param('id', PARAM_INT);
 $category_id = required_param('category', PARAM_INT);
 
@@ -11,15 +12,14 @@ $PAGE->set_url(new moodle_url('/blocks/sibcms/course.php', array('id' => $course
 require_login(1);
 
 if (!is_siteadmin()) {
-    echo $OUTPUT->header();
-    echo get_string('key59', 'block_sibcms');
-    echo $OUTPUT->footer();
-    die();
+    print_error('key59', 'block_sibcms');
 }
 
 $course = get_course($course_id);
 $category = coursecat::get($category_id);
 $PAGE->set_heading($course->fullname);
+$PAGE->navbar->ignore_active();
+$PAGE->navbar->add(get_string('key21', 'block_sibcms'), new moodle_url('/blocks/sibcms/category.php'));
 $path = $category->get_parents();
 foreach ($path as $parent) {
     $parent_category = coursecat::get($parent);
@@ -52,17 +52,23 @@ if ($mform->is_cancelled()) {
     );
     redirect(new moodle_url('/blocks/sibcms/courses.php', array('category' => $category->id)));
 } else {
-    $last_feedback = block_sibcms\sibcms_api::get_last_course_feedback($course_id);
-
     echo $output->header();
 
-    $mform->set_data(array(
-        'id' => $course_id,
+    $params = array(
+        'id'       => $course_id,
         'category' => $category_id,
-        'result' => $last_feedback->result,
-        'feedback' => $last_feedback->feedback,
-        'comment' => $last_feedback->comment
-    ));
+        'result'   => '',
+        'feedback' => '',
+        'comment'  => ''
+    );
+    $last_feedback = block_sibcms\sibcms_api::get_last_course_feedback($course_id);
+    if ($last_feedback) {
+        $params['result']   = $last_feedback->result;
+        $params['feedback'] = $last_feedback->feedback;
+        $params['comment']  = $last_feedback->comment;
+    }
+
+    $mform->set_data($params);
     $mform->display();
 
     echo $output->footer();

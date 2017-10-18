@@ -60,3 +60,4 @@ $string['key56'] = 'No grade';
 $string['key57'] = 'Points: {$a->points}';
 $string['key58'] = 'No errors founded';
 $string['key59'] = 'You have no permission to view this page';
+$string['key60'] = 'No remarks found ({$a->count})';
