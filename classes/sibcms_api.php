@@ -2,6 +2,8 @@
 
 namespace block_sibcms;
 
+defined('MOODLE_INTERNAL') || die;
+
 require_once($CFG->dirroot . '/mod/assign/locallib.php');
 require_once($CFG->dirroot . '/mod/quiz/locallib.php');
 
@@ -27,11 +29,8 @@ class sibcms_api
     public static function get_last_course_feedback($course_id)
     {
         global $DB;
-        $sql = 'SELECT *
-                  FROM {block_sibcms_feedbacks}
-                 WHERE courseid = ?
-              ORDER BY timecreated DESC';
-        return $DB->get_record_sql($sql, array($course_id));
+        $last_feedback = $DB->get_records('block_sibcms_feedbacks', array('courseid' => $course_id), 'timecreated DESC', '*', 0, 1);
+        return count($last_feedback) > 0 ? reset($last_feedback) : false;
     }
 
     /**
@@ -122,6 +121,16 @@ class sibcms_api
         if (!$all_quiz_have_questions) {
             $hints[] = get_string('key55', 'block_sibcms');
         }
+
+        $need_grading = 0;
+        foreach ($course_data->assigns as $assign) {
+            if (!$assign->teamsubmission && !$assign->nograde) {
+                $need_grading += $assign->need_grading;
+            }
+        }
+        if ($need_grading > 0) {
+            $hints[] = get_string('key60', 'block_sibcms', array('count' => $need_grading));
+        }
         return $hints;
     }
 
@@ -173,7 +182,7 @@ class sibcms_api
         return $DB->get_field('user_lastaccess', 'timeaccess',
             array(
                 'courseid' => $course_id,
-                'userid' => $user_id
+                'userid'   => $user_id
             )
         );
     }
@@ -196,8 +205,8 @@ class sibcms_api
 
         foreach ($modules as $module) {
 
-            //$visible = sibcms_api::get_modvisible($module);
-            //if ($onlyvisible && !$visible) continue;
+            $visible = sibcms_api::get_modvisible($module);
+            if ($onlyvisible && !$visible) continue;
             $cm = \context_module::instance($module->id);
             $assign = new \assign($cm, $module, $course);
             $instance = $assign->get_instance();
@@ -206,7 +215,7 @@ class sibcms_api
             $moddata->name = $module->name;
             $moddata->teamsubmission = $instance->teamsubmission;
             $moddata->nograde = $instance->grade == 0;
-            //$moddata->modvisible = $visible;
+            $moddata->modvisible = $visible;
             $moddata->visible = has_capability('mod/assign:view', $cm);
             $moddata->gradeitem = $assign->get_grade_item();
             if ($moddata->nograde) {
@@ -231,7 +240,7 @@ class sibcms_api
             if ($instance->teamsubmission) { // расчет по правилам Moodle
                 $moddata->participants = $assign->count_teams($activitygroup);
                 $moddata->submitted = $assign->count_submissions_with_status(ASSIGN_SUBMISSION_STATUS_DRAFT) +
-                    $assign->count_submissions_with_status(ASSIGN_SUBMISSION_STATUS_SUBMITTED);
+                                      $assign->count_submissions_with_status(ASSIGN_SUBMISSION_STATUS_SUBMITTED);
                 $moddata->need_grading = $assign->count_submissions_need_grading();
             } else { // расчет по собственным правилам
                 list($esql, $uparams) = get_enrolled_sql($cm, 'mod/assign:submit', $activitygroup, 'u.*', null, null, null, true);
@@ -284,8 +293,8 @@ class sibcms_api
 
         foreach ($modules as $module) {
 
-            //$visible = sibcms_api::get_modvisible($module);
-            //if ($onlyvisible && !$visible) continue;
+            $visible = sibcms_api::get_modvisible($module);
+            if ($onlyvisible && !$visible) continue;
             $cm = \context_module::instance($module->id);
             $quiz = \quiz::create($module->instance);
             $moddata = new \stdClass();
@@ -293,7 +302,7 @@ class sibcms_api
             $moddata->name = $module->name;
             $moddata->id = $module->id;
             $moddata->noquestions = !$quiz->has_questions();
-            //$moddata->modvisible = $visible;
+            $moddata->modvisible = $visible;
             $moddata->visible = has_capability('mod/quiz:view', $cm);
 
             list($esql, $uparams) = get_enrolled_sql($cm, 'mod/quiz:attempt', $activitygroup, 'u.*', null, null, null, true);
@@ -349,33 +358,32 @@ class sibcms_api
         foreach ($modules as $module) {
             if ($onlyvisible && !$module->visible) continue;
             $cm = \context_module::instance($module->id);
-            $files = $fs->get_area_files($cm->id, 'mod_folder',
-                'content', 0, null, false);
+            $files = $fs->get_area_files($cm->id, 'mod_folder', 'content', 0, null, false);
             $result += count($files);
         }
 
         return $result;
     }
 
-    /*
-        public static function set_modvisible($module, $visible) {
-            global $DB;
+    public static function set_modvisible($module, $visible) {
+        /*global $DB;
 
-            $count = $DB->count_records('report_activity_visibility', array('moduleid' => $module->id));
-            if ($count > 0) {
-                $DB->set_field('report_activity_visibility', 'visible', $visible, array('moduleid' => $module->id));
-            } else {
-                $DB->execute('INSERT INTO {report_activity_visibility} (courseid, moduleid, visible) VALUES (?, ?, ?)', array($module->course, $module->id, $visible));
-            }
-        }
+        $count = $DB->count_records('report_activity_visibility', array('moduleid' => $module->id));
+        if ($count > 0) {
+            $DB->set_field('report_activity_visibility', 'visible', $visible, array('moduleid' => $module->id));
+        } else {
+            $DB->execute('INSERT INTO {report_activity_visibility} (courseid, moduleid, visible) VALUES (?, ?, ?)', array($module->course, $module->id, $visible));
+        }*/
+        return true;
+    }
 
-        public static function get_modvisible($module) {
-            global $DB;
+    public static function get_modvisible($module) {
+        /*global $DB;
 
-            $record = $DB->get_record('report_activity_visibility', array('moduleid' => $module->id));
+        $record = $DB->get_record('report_activity_visibility', array('moduleid' => $module->id));
 
-            return !$record ? $module->visible : $record->visible;
-        }
-    */
+        return !$record ? $module->visible : $record->visible;*/
+        return true;
+    }
 
 }
