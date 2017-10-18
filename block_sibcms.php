@@ -27,9 +27,9 @@ class block_sibcms extends block_list
 
     function get_content()
     {
-        global $CFG, $PAGE;
+        global $CFG;
 
-        if (!isloggedin() || isguestuser() || !is_siteadmin()) {
+        if (!isloggedin() || !is_siteadmin()) {
             $this->content = '';
             return $this->content;
         }
