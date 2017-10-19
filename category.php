@@ -10,19 +10,17 @@ $PAGE->set_url(new moodle_url('/blocks/sibcms/category.php', array('category' =>
 require_login(1);
 
 if (!is_siteadmin()) {
-    echo $OUTPUT->header();
-    echo get_string('key59', 'block_sibcms');
-    echo $OUTPUT->footer();
-    die();
+    print_error('key59', 'block_sibcms');
 }
 
 // System foot link
-$PAGE->navbar->add(get_string('key21', 'block_sibcms'),
-    new moodle_url('/blocks/sibcms/category.php'));
+$PAGE->navbar->ignore_active();
+$PAGE->navbar->add(get_string('key21', 'block_sibcms'), new moodle_url('/blocks/sibcms/category.php'));
 
 if ($category_id == 0) {
-    $PAGE->set_heading(get_course(1)->shortname);
-    $PAGE->set_title(get_string('key22', 'block_sibcms', array('name' => get_course(1)->shortname)));
+    $site_name = get_course(1)->fullname;
+    $PAGE->set_heading($site_name);
+    $PAGE->set_title(get_string('key22', 'block_sibcms', array('name' => $site_name)));
 } else {
     $category = coursecat::get($category_id);
     $PAGE->set_heading($category->name);
