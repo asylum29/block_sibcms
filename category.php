@@ -9,11 +9,9 @@ $PAGE->set_url(new moodle_url('/blocks/sibcms/category.php', array('category' =>
 
 require_login(1);
 
-if (!is_siteadmin()) {
-    print_error('key59', 'block_sibcms');
-}
+require_capability('block/sibcms:monitoring', context_system::instance());
 
-// System foot link
+// System root link
 $PAGE->navbar->ignore_active();
 $PAGE->navbar->add(get_string('key21', 'block_sibcms'), new moodle_url('/blocks/sibcms/category.php'));
 
