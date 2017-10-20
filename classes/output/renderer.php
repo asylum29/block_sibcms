@@ -3,6 +3,8 @@
 
 namespace block_sibcms\output;
 
+use block_sibcms\sibcms_api;
+
 defined('MOODLE_INTERNAL') || die();
 
 class renderer extends \plugin_renderer_base
@@ -67,13 +69,14 @@ class renderer extends \plugin_renderer_base
                 get_string('key12', 'block_sibcms'),
                 get_string('key13', 'block_sibcms')
             );
+            $table->align[0] = 'center';
             foreach ($widget->courses as $course) {
                 $feedback = \block_sibcms\sibcms_api::get_last_course_feedback($course->id);
                 $time_ago = get_string('never');
                 if (!empty($feedback)) {
                     $time_ago = format_time(time() - $feedback->timecreated);
                 }
-                $status = '—';
+                $status = \html_writer::span('[НЕТ ОТЗЫВА]', 'red');
                 if ($feedback) {
                     if ($feedback->result == 0) {
                         $status = \html_writer::span(get_string('key23', 'block_sibcms'), 'green');
@@ -82,13 +85,12 @@ class renderer extends \plugin_renderer_base
                         $status = \html_writer::span(get_string('key24', 'block_sibcms'));
                     }
                     if ($feedback->result == 2) {
-                        $status = \html_writer::span(get_string('key25', 'block_sibcms'), 'red');
+                        $status = \html_writer::span(get_string('key25', 'block_sibcms'));
                     }
                     if ($feedback->result == 3) {
                         $status = \html_writer::span(get_string('key26', 'block_sibcms'), 'red');
                     }
                 }
-                $table->align[0] = 'center';
                 $table->data[] = array(
                     \block_sibcms\sibcms_api::require_attention($course->id) ?
                         \html_writer::span('!', 'bold red text-center') : '',
@@ -109,6 +111,55 @@ class renderer extends \plugin_renderer_base
         } else {
             $result .= $OUTPUT->heading(get_string('key6', 'block_sibcms'));
         }
+        return $result;
+    }
+
+    public function render_form_assigns_data_table(form_assigns_data_table $widget) {
+        $table = new \html_table();
+        $table->head = $widget->table_head;
+        $table->size = $widget->table_size;
+        $table->data = $widget->table_data;
+        $table_str = \html_writer::table($table);
+        return $table_str;
+    }
+
+    public function render_form_quiz_data_table(form_quiz_data_table $widget) {
+        $table = new \html_table();
+        $table->head = $widget->table_head;
+        $table->size = $widget->table_size;
+        $table->data = $widget->table_data;
+        $table_str = \html_writer::table($table);
+        return $table_str;
+    }
+
+    public function render_activity_assigns_data_table(activity_assigns_data_table $widget) {
+        return '';
+    }
+
+    public function render_activity_quiz_data_table(activity_quiz_data_table $widget) {
+        return '';
+    }
+
+    public function render_monitoring_assigns_data_table(monitoring_assigns_data_table $widget) {
+        return '';
+    }
+
+    public function render_monitoring_quiz_data_table(monitoring_quiz_data_table $widget) {
+        return '';
+    }
+
+    public function display_monitoring_report($category_id) {
+        $category = \coursecat::get($category_id);
+        $courses = $category->get_courses(); // TODO: Recursive
+
+        $result = '';
+
+        foreach ($courses as $course) {
+            $course_data = sibcms_api::get_course_data($course->id);
+            $assign_table = new monitoring_assigns_data_table($course_data);
+            $result .= $this->render($assign_table);
+        }
+
         return $result;
     }
 

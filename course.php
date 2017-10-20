@@ -11,9 +11,7 @@ $PAGE->set_url(new moodle_url('/blocks/sibcms/course.php', array('id' => $course
 
 require_login(1);
 
-if (!is_siteadmin()) {
-    print_error('key59', 'block_sibcms');
-}
+require_capability('block/sibcms:monitoring', context_system::instance());
 
 $course = get_course($course_id);
 $category = coursecat::get($category_id);

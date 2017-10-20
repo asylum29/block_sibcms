@@ -1,6 +1,8 @@
 <?php
 
-// Ссылка на страницу мониторинга курса
+defined('MOODLE_INTERNAL') || die;
+
+// Link to feedback form page
 function block_sibcms_extend_navigation_course(navigation_node $navigation, $course, $context)
 {
     if (has_capability('block/sibcms:monitoring', $context)) {
