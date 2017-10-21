@@ -277,7 +277,7 @@ class renderer extends \plugin_renderer_base
                     if ($feedback) {
                         $comment = $feedback->feedback;
                         if ($feedback->result == 0) {
-                            $class = 'block_sibcms_lightred';
+                            $class = 'block_sibcms_lightgreen';
                         } else if ($feedback->result == 1) {
                             $class = 'block_sibcms_lightyellow';
                         } else {
