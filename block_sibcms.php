@@ -29,7 +29,8 @@ class block_sibcms extends block_list
     {
         global $CFG, $OUTPUT;
 
-        if (!isloggedin() || !is_siteadmin()) {
+        $monitoring = has_capability('block/sibcms:monitoring', context_system::instance());
+        if (!isloggedin() || !$monitoring) {
             $this->content = '';
             return $this->content;
         }
