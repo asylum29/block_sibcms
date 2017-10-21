@@ -2,6 +2,9 @@
 
 namespace block_sibcms;
 
+use block_sibcms\output\form_assigns_data_table;
+use block_sibcms\output\form_quiz_data_table;
+
 defined('MOODLE_INTERNAL') || die();
 
 class feedback_form extends \moodleform
@@ -9,8 +12,10 @@ class feedback_form extends \moodleform
 
     public function definition()
     {
+        global $PAGE;
         $mform = $this->_form;
         $course_data = $this->_customdata['course_data'];
+        $renderer = $PAGE->get_renderer('block_sibcms');
 
         // Course ID
         $mform->addElement('hidden', 'id', null);
@@ -63,49 +68,8 @@ class feedback_form extends \moodleform
         // Assigns information
         $assigns = $course_data->assigns;
         if (count($assigns)) {
-            $assign_table = new \html_table();
-            $assign_table->head = array(
-                get_string('key38', 'block_sibcms'),
-                get_string('key39', 'block_sibcms'),
-                get_string('key40', 'block_sibcms'),
-                get_string('key41', 'block_sibcms'),
-                get_string('key42', 'block_sibcms'),
-                get_string('key43', 'block_sibcms'),
-                get_string('key44', 'block_sibcms'),
-                get_string('key45', 'block_sibcms')
-            );
-            $assign_table->size[0] = '20%';
-            $assign_table->size[1] = '10%';
-            $assign_table->size[2] = '10%';
-            $assign_table->size[3] = '10%';
-            $assign_table->size[4] = '10%';
-            $assign_table->size[5] = '10%';
-            $assign_table->size[6] = '15%';
-            $assign_table->size[7] = '15%';
-            foreach ($assigns as $assign) {
-                $feedbacks = $assign->feedbacks;
-                $feedbacks_names = array();
-                foreach ($feedbacks as $feedback) {
-                    $feedbacks_names[] = $feedback->get_name();
-                }
-                $submit_persent = ($assign->participants == 0) ?
-                    '0%' :
-                    format_float(100 * $assign->submitted / $assign->participants, 2) . '%';
-                $graded_persent = ($assign->participants == 0) ?
-                    '0%' :
-                    format_float(100 * $assign->graded / $assign->participants, 2) . '%';
-                $assign_table->data[] = array(
-                    $assign->name,
-                    $assign->participants,
-                    $assign->submitted,
-                    $submit_persent,
-                    $assign->graded,
-                    $graded_persent,
-                    $assign->grade,
-                    \html_writer::alist($feedbacks_names)
-                );
-            }
-            $assign_table_str = \html_writer::table($assign_table);
+            $assign_table = new form_assigns_data_table($course_data);
+            $assign_table_str = $renderer->render($assign_table);
             $mform->addElement('static', 'assign_table',
                 get_string('key37', 'block_sibcms'),
                 $assign_table_str
@@ -115,32 +79,14 @@ class feedback_form extends \moodleform
         // Quiz information
         $quiz = $course_data->quiz;
         if (count($quiz)) {
-            $quiz_table = new \html_table();
-            $quiz_table->head = array(
-                get_string('key46', 'block_sibcms'),
-                get_string('key47', 'block_sibcms'),
-                get_string('key48', 'block_sibcms'),
-                get_string('key49', 'block_sibcms')
+
+            $quiz_table = new form_quiz_data_table($course_data);
+            $quiz_table_str = $renderer->render($quiz_table);
+            $mform->addElement('static', 'quiz_table',
+                get_string('key37', 'block_sibcms'),
+                $quiz_table_str
             );
-            $quiz_table->size[0] = '70%';
-            $quiz_table->size[1] = '10%';
-            $quiz_table->size[2] = '10%';
-            $quiz_table->size[3] = '10%';
-            foreach ($quiz as $test) {
-                $name_str = $test->name;
-                if ($test->noquestions) {
-                    $name_str .= \html_writer::span('!', 'red');
-                }
-                $persents = ($test->countgrades == 0) ? '0%' : format_float(100 * $test->countgrades / $test->countusers, 2) . '%';
-                $quiz_table->data[] = array(
-                    $name_str,
-                    $test->countusers,
-                    $test->countgrades,
-                    $persents
-                );
-            }
-            $quiz_table_text = \html_writer::table($quiz_table);
-            $mform->addElement('static', 'quiz_table', get_string('key36', 'block_sibcms'), $quiz_table_text);
+
         }
 
         // Course status

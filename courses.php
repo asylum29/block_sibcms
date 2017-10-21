@@ -10,9 +10,7 @@ $PAGE->set_url(new moodle_url('/blocks/sibcms/courses.php', array('category' => 
 
 require_login(1);
 
-if (!is_siteadmin()) {
-    print_error('key59', 'block_sibcms');
-}
+require_capability('block/sibcms:monitoring', context_system::instance());
 
 // Ссылка на корень системы
 $PAGE->navbar->add(get_string('key21', 'block_sibcms'), new moodle_url('/blocks/sibcms/category.php'));

@@ -27,7 +27,7 @@ class block_sibcms extends block_list
 
     function get_content()
     {
-        global $CFG;
+        global $CFG, $OUTPUT;
 
         if (!isloggedin() || !is_siteadmin()) {
             $this->content = '';
@@ -44,7 +44,7 @@ class block_sibcms extends block_list
         $this->content->footer = '';
 
         $this->content->items[] = html_writer::tag('a', get_string('key1', 'block_sibcms'), array('href' => $CFG->wwwroot . '/blocks/sibcms/category.php'));
-        //$this->content->icons[] = html_writer::empty_tag('img', array('src' => $CFG->wwwroot.'/blocks/sibportfolio/pix/sibport.png'));
+        $this->content->icons[] = $OUTPUT->pix_icon('monitoring', '', 'block_sibcms', array('class' => 'iconsmall'));
 
         return $this->content;
     }

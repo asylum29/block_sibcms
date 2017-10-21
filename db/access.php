@@ -26,6 +26,33 @@ $capabilities = array(
         'riskbitmask' => RISK_SPAM | RISK_XSS,
         'captype' => 'write',
         'contextlevel' => CONTEXT_SYSTEM
-    )
+    ),
+
+    'block/sibcms:activity_report' => array(
+        'riskbitmask'  => RISK_PERSONAL,
+        'captype' 	   => 'read',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes'   => array(
+            'teacher' 		 => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager' 		 => CAP_ALLOW
+        )
+    ),
+
+    'block/sibcms:monitoring_report' => array(
+        'captype'      => 'read',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes'   => array(
+            'teacher'        => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager'        => CAP_ALLOW
+        )
+    ),
+
+    'block/sibcms:monitoring_report_category' => array(
+        'riskbitmask'  => RISK_PERSONAL,
+        'captype'      => 'read',
+        'contextlevel' => CONTEXT_COURSECAT,
+    ),
 
 );

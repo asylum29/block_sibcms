@@ -11,9 +11,7 @@ $PAGE->set_url(new moodle_url('/blocks/sibcms/course.php', array('id' => $course
 
 require_login(1);
 
-if (!is_siteadmin()) {
-    print_error('key59', 'block_sibcms');
-}
+require_capability('block/sibcms:monitoring', context_system::instance());
 
 $course = get_course($course_id);
 $category = coursecat::get($category_id);
@@ -50,6 +48,8 @@ if ($mform->is_cancelled()) {
         $data->comment,
         $data->result
     );
+    $event = \block_sibcms\event\comment_created::create(array('objectid' => $course_id, 'other' => array('category' => $category_id)));
+    $event->trigger();
     redirect(new moodle_url('/blocks/sibcms/courses.php', array('category' => $category->id)));
 } else {
     echo $output->header();
