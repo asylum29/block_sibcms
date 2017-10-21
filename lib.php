@@ -7,7 +7,7 @@ require_once($CFG->libdir.'/coursecatlib.php');
 // Link to feedback form page
 function block_sibcms_extend_navigation_course(navigation_node $navigation, $course, $context)
 {
-    $monitoring        = has_capability('block/sibcms:activity_report', context_system::instance());
+    $monitoring        = has_capability('block/sibcms:monitoring', context_system::instance());
     $activity_report   = has_capability('block/sibcms:activity_report', $context);
     $monitoring_report = has_capability('block/sibcms:monitoring_report', $context) &&
                          count(coursecat::make_categories_list('block/sibcms:monitoring_report_category')) > 0;
