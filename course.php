@@ -48,6 +48,8 @@ if ($mform->is_cancelled()) {
         $data->comment,
         $data->result
     );
+    $event = \block_sibcms\event\comment_created::create(array('objectid' => $course_id, 'other' => array('category' => $category_id)));
+    $event->trigger();
     redirect(new moodle_url('/blocks/sibcms/courses.php', array('category' => $category->id)));
 } else {
     echo $output->header();
