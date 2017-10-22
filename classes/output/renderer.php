@@ -1,6 +1,5 @@
 <?php
 
-
 namespace block_sibcms\output;
 
 use block_sibcms\sibcms_api;
@@ -99,8 +98,11 @@ class renderer extends \plugin_renderer_base
                     $status,
                     \html_writer::tag('a', get_string('key19', 'block_sibcms'),
                         array(
-                            'href' => new \moodle_url('/blocks/sibcms/course.php',
-                                array('id' => $course->id, 'category' => $widget->category_id))
+                            'href' => new \moodle_url('/blocks/sibcms/course.php', array(
+                                'id'       => $course->id,
+                                'category' => $widget->category_id,
+                                'page'     => $widget->page
+                            ))
                         )
                     )
                 );
@@ -133,32 +135,213 @@ class renderer extends \plugin_renderer_base
     }
 
     public function render_activity_assigns_data_table(activity_assigns_data_table $widget) {
-        return '';
+        $table = new \html_table();
+        $table->attributes['class'] = 'generaltable block_sibcms_reporttable';
+        $table->head = $widget->table_head;
+        $table->size = $widget->table_size;
+        $table->data = $widget->table_data;
+        $table_str = \html_writer::table($table);
+        return $table_str;
     }
 
     public function render_activity_quiz_data_table(activity_quiz_data_table $widget) {
-        return '';
+        $table = new \html_table();
+        $table->attributes['class'] = 'generaltable block_sibcms_reporttable';
+        $table->head = $widget->table_head;
+        $table->size = $widget->table_size;
+        $table->data = $widget->table_data;
+        $table_str = \html_writer::table($table);
+        return $table_str;
     }
 
-    public function render_monitoring_assigns_data_table(monitoring_assigns_data_table $widget) {
-        return '';
-    }
+    public function display_activity_report($course_id) {
+        global $PAGE, $OUTPUT, $CFG;
 
-    public function render_monitoring_quiz_data_table(monitoring_quiz_data_table $widget) {
-        return '';
-    }
+        $result = \html_writer::start_div('', array('id' => 'block_sibcms'));
 
-    public function display_monitoring_report($category_id) {
-        $category = \coursecat::get($category_id);
-        $courses = $category->get_courses(); // TODO: Recursive
+        $course = get_course($course_id);
+        $result .= groups_print_course_menu($course, $PAGE->url, true);
+        $group = groups_get_course_group($course);
+        $course_data = sibcms_api::get_course_data($course, $group);
 
-        $result = '';
+        $graders = $course_data->graders;
+        if (count($graders) > 0) {
+            $result .= $OUTPUT->heading(get_string('key28', 'block_sibcms'), 3);
 
-        foreach ($courses as $course) {
-            $course_data = sibcms_api::get_course_data($course->id);
-            $assign_table = new monitoring_assigns_data_table($course_data);
+            $table = new \html_table();
+            $table->attributes['class'] = 'generaltable block_sibcms_gradertable';
+            $table->head = array(
+                get_string('key66', 'block_sibcms'),
+                get_string('key67', 'block_sibcms')
+            );
+
+            foreach ($graders as $grader) {
+                $cells = array();
+
+                $user_url = "$CFG->wwwroot/user/view.php?id=$grader->id&course=$course_id";
+                $content = $OUTPUT->user_picture($grader, array('size' => 15)) . '&nbsp;' .\html_writer::link($user_url, fullname($grader));
+                $cells[] = $cell = new \html_table_cell($content);
+
+                $content = $grader->lastcourseaccess ?
+                    userdate($grader->lastcourseaccess) . '&nbsp;(' . format_time(time() - $grader->lastcourseaccess) . ')' :
+                    get_string('never');
+                $cells[] = new \html_table_cell($content);
+
+                $table->data[] = new \html_table_row($cells);
+            }
+
+            $result .= \html_writer::table($table);
+        }
+
+        if (count($course_data->assigns) > 0) {
+            $result .= $OUTPUT->heading(get_string('key37', 'block_sibcms'), 3);
+            $assign_table = new activity_assigns_data_table($course_data);
             $result .= $this->render($assign_table);
         }
+
+        if (count($course_data->quiz) > 0) {
+            $result .= $OUTPUT->heading(get_string('key36', 'block_sibcms'), 3);
+            $quiz_table = new activity_quiz_data_table($course_data);
+            $result .= $this->render($quiz_table);
+        }
+
+        $value = $course_data->result * 100;
+        if ($value < 50) {
+            $class = 'block_sibcms_red';
+        } else if ($value < 85) {
+            $class = 'block_sibcms_yellow';
+        } else {
+            $class = 'block_sibcms_green';
+        }
+        $content = \html_writer::start_span($class) . format_float($value, 2, true, true) . '%' . \html_writer::end_span();
+        $result .= $OUTPUT->heading(get_string('key62', 'block_sibcms', $content), 3);
+
+        $result .= \html_writer::end_div();
+
+        return $result;
+    }
+
+    public function display_monitoring_report($course_id, $category_id) {
+        global $PAGE, $OUTPUT, $CFG;
+
+        $result = \html_writer::start_div('', array('id' => 'block_sibcms'));
+
+        $categories = \coursecat::make_categories_list('block/sibcms:monitoring_report_category');
+        if (count($categories) > 0) {
+            $params = array('id' => $course_id, 'category' => $category_id);
+            $exporturl = new \moodle_url($CFG->wwwroot . '/blocks/sibcms/export.php', $params);
+            $result .= $OUTPUT->single_button($exporturl, get_string('key64', 'block_sibcms'), 'get');
+
+            $label = $OUTPUT->container(get_string('categories') . ':', 'block_sibcms_coursecat_label');
+            $select = $OUTPUT->single_select($PAGE->url, 'category', $categories, $category_id);
+            $result .= $OUTPUT->container($label . $select, 'block_sibcms_coursecat_select');
+
+            $courses = $category_id > 0 ? \coursecat::get($category_id)->get_courses(array('recursive' => true)) : array();
+            if (count($courses) > 0) {
+                $table = new \html_table();
+                $table->attributes['class'] = 'table block_sibcms_monitoringtable';
+                $table->head = array(
+                    get_string('key27', 'block_sibcms'),
+                    get_string('key28', 'block_sibcms'),
+                    get_string('key29', 'block_sibcms'),
+                    ''
+                );
+                $table->size = array('40%', '30%', '30%', '25px');
+
+                foreach ($courses as $course) {
+                    if (!$course->visible) continue;
+
+                    $cells = array();
+                    $course_data = sibcms_api::get_course_data($course);
+
+                    $content = $OUTPUT->pix_icon('i/course', null, '', array('class' => 'icon')) . $course_data->fullname;
+                    if (has_capability('moodle/course:view', \context_course::instance($course->id))) {
+                        $courseurl = "$CFG->wwwroot/course/view.php?id=$course_data->id";
+                        $content = \html_writer::link($courseurl, $content);
+                    }
+                    $content = $OUTPUT->heading($content, 4, 'block_sibcms_coursename');
+                    $cells[] = new \html_table_cell($content);
+
+                    $content = '';
+                    $graders = $course_data->graders;
+                    if (count($graders) > 0) {
+                        foreach ($graders as $grader) {
+                            $userurl = "$CFG->wwwroot/user/view.php?id=$grader->id&course=$course_data->id";
+                            $content .= \html_writer::link($userurl, fullname($grader)) . '&nbsp;';
+                            $content .= $grader->lastcourseaccess ? '(' . format_time(time() - $grader->lastcourseaccess) . ')' : '(' . get_string('never') . ')';
+                            $content .= '<br />';
+                        }
+                    } else $content = get_string('key50', 'block_sibcms');
+                    $cells[] = new \html_table_cell($content);
+                    
+                    $notices = array();
+                    $class = 'block_sibcms_lightgray';
+                    $feedback = sibcms_api::get_last_course_feedback($course_data->id);
+                    if ($feedback) {
+                        if (trim($feedback->feedback) != '') {
+                            $comment = $feedback->feedback . '<br />';
+                            $comment .= \html_writer::tag('i', '[ПРОСМОТРЕН:]&nbsp;' . userdate($feedback->timecreated, '%d %b %Y, %H:%M'));
+                            $notices[] = $comment;
+                        }
+                        if ($feedback->result == 0) {
+                            $class = 'block_sibcms_lightgreen';
+                        } else if ($feedback->result == 1) {
+                            $class = 'block_sibcms_lightyellow';
+                        } else {
+                            $class = 'block_sibcms_lightred';
+                        }
+                    } else {
+                        $notices[] = '[НЕ ПРОСМАТРИВАЛСЯ АДМИНИСТРАТОРОМ]';
+                    }
+                    $content = format_float($course_data->result * 100, 2, true, true) . '%';
+                    $content = get_string('key65', 'block_sibcms', $content);
+                    $notices[] = \html_writer::tag('b', $content);
+                    if (has_capability('block/sibcms:monitoring', \context_system::instance())) {
+                        $params = array('id' => $course->id, 'category' => $course->category);
+                        $course_url = new \moodle_url("$CFG->wwwroot/blocks/sibcms/course.php", $params);
+                        $content = \html_writer::link($course_url, get_string('key19', 'block_sibcms'), array('target' => '_blank'));
+                        $content .= '&nbsp;' . $OUTPUT->pix_icon('monitoring', '', 'block_sibcms', array('class' => 'iconsmall'));
+                        $notices[] = $content;
+                    }
+                    $cells[] = \html_writer::alist($notices);
+
+                    $content = ((count($course_data->assigns) > 0) || count($course_data->quiz) > 0) ? \html_writer::div('', 'block_sibcms_showmore') : '';
+                    $cells[] = new \html_table_cell($content);
+
+                    $row = new \html_table_row($cells);
+                    $row->attributes['class'] = $class;
+                    $table->data[] = $row;
+
+                    $content = \html_writer::start_div('block_sibcms_coursestats');
+                    if (count($course_data->assigns) > 0) {
+                        $content .= \html_writer::div(get_string('key37', 'block_sibcms') . ':', 'block_sibcms_modheader');
+                        $assign_table = new activity_assigns_data_table($course_data);
+                        $content .= $this->render($assign_table);
+                    }
+                    if (count($course_data->quiz) > 0) {
+                        $content .= \html_writer::div(get_string('key36', 'block_sibcms') . ':', 'block_sibcms_modheader');
+                        $quiz_table = new activity_quiz_data_table($course_data);
+                        $content .= $this->render($quiz_table);
+                    }
+                    $content .= \html_writer::end_div();
+                    $cell = new \html_table_cell($content);
+                    $cell->attributes['class'] = 'block_sibcms_coursestats';
+                    $cell->colspan = 4;
+
+                    $table->data[] = new \html_table_row(array($cell));
+
+                    $cell = new \html_table_cell('');
+                    $cell->attributes['class'] = 'block_sibcms_separator';
+                    $cell->colspan = 4;
+
+                    $table->data[] = new \html_table_row(array($cell));
+                }
+
+                $result .= \html_writer::table($table);
+            }
+        }
+
+        $result .= \html_writer::end_div();
 
         return $result;
     }

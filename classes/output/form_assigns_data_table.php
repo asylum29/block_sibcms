@@ -57,7 +57,7 @@ class form_assigns_data_table implements \renderable
             if (!$assign->teamsubmission && !$assign->nograde) {
                 $table_row_data[] = $assign->graded;
             } else {
-                $table_row_data[] = '-';
+                $table_row_data[] = '—';
             }
             // Grade type
             $table_row_data[] = $assign->grade;
@@ -71,16 +71,6 @@ class form_assigns_data_table implements \renderable
             // Write data
             $this->table_data[] = $table_row_data;
         }
-
-        // Result row
-        /*
-        $result_row = array();
-        $result_row[] = '[ИТОГИ]';
-        $result_row[] = $course_data->assigns_results->participants;
-        $result_row[] = $course_data->assigns_results->submitted;
-        $result_row[] = $course_data->assigns_results->graded;
-        $this->table_data[] = $result_row;
-        */
 
     }
 

@@ -1,0 +1,88 @@
+#block_sibcms .block_sibcms_red {
+    color: darkred;
+    font-weight: bold;
+}
+
+#block_sibcms .block_sibcms_yellow {
+    color: #5c5b00;
+    font-weight: bold;
+}
+
+#block_sibcms .block_sibcms_green {
+    color: darkgreen;
+    font-weight: bold;
+}
+
+#block_sibcms .block_sibcms_lightred {
+    background-color: rgb(240, 230, 230);
+}
+
+#block_sibcms .block_sibcms_lightgreen {
+    background-color: rgb(230, 240, 230);
+}
+
+#block_sibcms .block_sibcms_lightyellow {
+    background-color: rgb(240, 240, 200);
+}
+
+#block_sibcms .block_sibcms_lightgray {
+    background-color: rgb(235, 235, 235);
+}
+
+#block_sibcms .block_sibcms_gradertable td.cell,
+#block_sibcms .block_sibcms_gradertable th.header {
+    padding: 1px 0.5em 1px 1em;
+}
+
+#block_sibcms .block_sibcms_reporttable tr.lastrow > td.cell,
+#block_sibcms .block_sibcms_reporttable th.header {
+    font-weight: bold;
+    background-color: lightgray;
+}
+
+#block_sibcms .block_sibcms_coursecat_select {
+    text-align: center;
+}
+
+#block_sibcms .block_sibcms_coursecat_label {
+    margin-bottom: 5px;
+}
+
+#block_sibcms .block_sibcms_monitoringtable {
+    margin-top: 5px;
+}
+
+#block_sibcms .block_sibcms_monitoringtable > thead th.header {
+    font-weight: bold;
+    background-color: lightgray;
+}
+
+#block_sibcms .block_sibcms_coursename {
+    margin: 0;
+}
+
+#block_sibcms .block_sibcms_separator {
+    padding: 2px !important;
+    border: none !important;
+}
+
+#block_sibcms td.block_sibcms_coursestats {
+    padding: 0 !important;
+}
+
+#block_sibcms .block_sibcms_monitoringtable div.block_sibcms_coursestats {
+    margin-left: 10px;
+    margin-right: 10px;
+    border: 1px solid silver;
+    border-top: none;
+}
+
+#block_sibcms .block_sibcms_monitoringtable .block_sibcms_reporttable {
+    margin: 0 !important;
+}
+
+#block_sibcms .block_sibcms_monitoringtable .block_sibcms_modheader {
+    font-weight: bold;
+    padding-left: 10px;
+    padding-top: 5px;
+}

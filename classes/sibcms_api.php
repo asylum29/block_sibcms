@@ -163,9 +163,10 @@ class sibcms_api
     /**
      * Get united course data
      * @param $course
+     * @param $group
      * @return \stdClass
      */
-    public static function get_course_data($course)
+    public static function get_course_data($course, $group = 0)
     {
         $modinfo = get_fast_modinfo($course->id);
         $result = new \stdClass();
@@ -175,15 +176,15 @@ class sibcms_api
         $result->graders = sibcms_api::get_course_graders($course->id);
         $result->participants = sibcms_api::get_count_course_participants($course->id);
         $result->filescount = sibcms_api::get_count_course_files($course->id);
-        $assign_data = sibcms_api::get_assign_grades_data($modinfo, 0, true);
+        $assign_data = sibcms_api::get_assign_grades_data($modinfo, $group, true);
         $result->assigns = $assign_data['data'];
         $result->assigns_results = $assign_data['results'];
-        $quiz_data = sibcms_api::get_quiz_grades_data($modinfo, 0, true);
+        $quiz_data = sibcms_api::get_quiz_grades_data($modinfo, $group, true);
         $result->quiz = $quiz_data['data'];
         $result->quiz_results = $quiz_data['results'];
         $all_tasks = $result->assigns_results->participants + $result->quiz_results->participants;
         $all_grades = $result->assigns_results->finished + $result->quiz_results->submitted;
-        $result->result = $all_tasks > 0 ? $all_grades / $all_tasks * 100 : 0;
+        $result->result = $all_tasks > 0 ? $all_grades / $all_tasks : 0;
         return $result;
     }
 
@@ -329,8 +330,8 @@ class sibcms_api
 
         }
 
-        $results->submitted_persent = $results->participants > 0 ? $results->submitted / $results->participants * 100 : 0;
-        $results->graded_persent = $results->participants > 0 ? $results->graded / $results->need_grading * 100 : 0;
+        $results->submitted_persent = $results->participants > 0 ? $results->submitted / $results->participants : 0;
+        $results->graded_persent = $results->need_grading > 0 ? $results->graded / $results->need_grading : 0;
 
         return array('data' => $data, 'results' => $results);
     }
@@ -393,7 +394,7 @@ class sibcms_api
 
         }
 
-        $results->submitted_persent = $results->participants > 0 ? $results->submitted / $results->participants * 100 : 0;
+        $results->submitted_persent = $results->participants > 0 ? $results->submitted / $results->participants : 0;
 
         return array('data' => $data, 'results' => $results);
     }
@@ -458,7 +459,7 @@ class sibcms_api
         $record = $DB->get_record('report_activity_visibility', array('moduleid' => $module->id));
 
         return !$record ? $module->visible : $record->visible;*/
-        return true;
+        return $module->visible;
     }
 
 }
