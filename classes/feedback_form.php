@@ -25,9 +25,13 @@ class feedback_form extends \moodleform
         $mform->addElement('hidden', 'category', null);
         $mform->setType('category', PARAM_INT);
 
+        // Page
+        $mform->addElement('hidden', 'page', null);
+        $mform->setType('page', PARAM_INT);
+
         // Course link
         $course_url = new \moodle_url('/course/view.php', array('id' => $course_data->id));
-        $course_link = \html_writer::link($course_url, $course_data->fullname);
+        $course_link = \html_writer::link($course_url, $course_data->fullname, array('target' => '_blank'));
         $mform->addElement('static', 'course_fullname', get_string('key27', 'block_sibcms'), $course_link);
 
         // Graders

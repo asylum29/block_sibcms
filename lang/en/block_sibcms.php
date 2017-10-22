@@ -75,3 +75,6 @@ $string['key68'] = 'Course progress';
 $string['key69'] = 'Report «Course activity» was viewed';
 $string['key70'] = 'Report «Course monitoring» was viewed';
 $string['key71'] = 'Comment editing';
+$string['key72'] = 'Has not graded submissions';
+$string['key73'] = 'Group mode';
+$string['key74'] = 'No questions';
