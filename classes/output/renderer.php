@@ -296,7 +296,7 @@ class renderer extends \plugin_renderer_base
                     $content = format_float($course_data->result * 100, 2, true, true) . '%';
                     $content = get_string('key65', 'block_sibcms', $content);
                     $notices[] = \html_writer::tag('b', $content);
-                    if (has_capability('block/sibcms:activity_report', \context_system::instance())) {
+                    if (has_capability('block/sibcms:monitoring', \context_system::instance())) {
                         $params = array('id' => $course->id, 'category' => $course->category);
                         $course_url = new \moodle_url("$CFG->wwwroot/blocks/sibcms/course.php", $params);
                         $content = \html_writer::link($course_url, get_string('key19', 'block_sibcms'), array('target' => '_blank'));

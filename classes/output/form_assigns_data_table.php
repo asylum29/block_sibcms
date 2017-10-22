@@ -57,7 +57,7 @@ class form_assigns_data_table implements \renderable
             if (!$assign->teamsubmission && !$assign->nograde) {
                 $table_row_data[] = $assign->graded;
             } else {
-                $table_row_data[] = '-';
+                $table_row_data[] = '—';
             }
             // Grade type
             $table_row_data[] = $assign->grade;
