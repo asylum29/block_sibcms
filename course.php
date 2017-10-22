@@ -4,8 +4,9 @@ require_once('../../config.php');
 require_once('../../lib/coursecatlib.php');
 require_once("$CFG->libdir/formslib.php");
 
-$course_id = required_param('id', PARAM_INT);
+$course_id   = required_param('id', PARAM_INT);
 $category_id = required_param('category', PARAM_INT);
+$page        = optional_param('page', 0, PARAM_INT);
 
 $PAGE->set_url(new moodle_url('/blocks/sibcms/course.php', array('id' => $course_id, 'category' => $category_id)));
 
@@ -40,7 +41,7 @@ $custom_data = array(
 $mform = new block_sibcms\feedback_form(null, $custom_data);
 
 if ($mform->is_cancelled()) {
-    redirect(new moodle_url('/blocks/sibcms/courses.php', array('category' => $category->id)));
+    redirect(new moodle_url('/blocks/sibcms/courses.php', array('category' => $category->id, 'page' => $page)));
 } else if ($data = $mform->get_data()) {
     \block_sibcms\sibcms_api::save_feedback(
         $data->id,
@@ -50,13 +51,14 @@ if ($mform->is_cancelled()) {
     );
     $event = \block_sibcms\event\comment_created::create(array('objectid' => $course_id, 'other' => array('category' => $category_id)));
     $event->trigger();
-    redirect(new moodle_url('/blocks/sibcms/courses.php', array('category' => $category->id)));
+    redirect(new moodle_url('/blocks/sibcms/courses.php', array('category' => $category->id, 'page' => $page)));
 } else {
     echo $output->header();
 
     $params = array(
         'id'       => $course_id,
         'category' => $category_id,
+        'page'     => $page,
         'result'   => '',
         'feedback' => '',
         'comment'  => ''

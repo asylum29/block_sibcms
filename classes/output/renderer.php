@@ -98,8 +98,11 @@ class renderer extends \plugin_renderer_base
                     $status,
                     \html_writer::tag('a', get_string('key19', 'block_sibcms'),
                         array(
-                            'href' => new \moodle_url('/blocks/sibcms/course.php',
-                                array('id' => $course->id, 'category' => $widget->category_id))
+                            'href' => new \moodle_url('/blocks/sibcms/course.php', array(
+                                'id'       => $course->id,
+                                'category' => $widget->category_id,
+                                'page'     => $widget->page
+                            ))
                         )
                     )
                 );
@@ -270,12 +273,16 @@ class renderer extends \plugin_renderer_base
                         }
                     } else $content = get_string('key50', 'block_sibcms');
                     $cells[] = new \html_table_cell($content);
-
-                    $comment = '[НЕ ПРОСМАТРИВАЛСЯ АДМИНИСТРАТОРОМ]';
+                    
+                    $notices = array();
                     $class = 'block_sibcms_lightgray';
                     $feedback = sibcms_api::get_last_course_feedback($course_data->id);
                     if ($feedback) {
-                        $comment = $feedback->feedback;
+                        if (trim($feedback->feedback) != '') {
+                            $comment = $feedback->feedback . '<br />';
+                            $comment .= \html_writer::tag('i', '[ПРОСМОТРЕН:]&nbsp;' . userdate($feedback->timecreated, '%d %b %Y, %H:%M'));
+                            $notices[] = $comment;
+                        }
                         if ($feedback->result == 0) {
                             $class = 'block_sibcms_lightgreen';
                         } else if ($feedback->result == 1) {
@@ -283,10 +290,8 @@ class renderer extends \plugin_renderer_base
                         } else {
                             $class = 'block_sibcms_lightred';
                         }
-                    }
-                    $notices = array();
-                    if (trim($comment) != '') {
-                        $notices[] = $comment;
+                    } else {
+                        $notices[] = '[НЕ ПРОСМАТРИВАЛСЯ АДМИНИСТРАТОРОМ]';
                     }
                     $content = format_float($course_data->result * 100, 2, true, true) . '%';
                     $content = get_string('key65', 'block_sibcms', $content);

@@ -36,7 +36,7 @@ class activity_quiz_data_table implements \renderable
                 $content = \html_writer::link($quizurl, $content) . '&nbsp;';
             }
             if ($quiz->noquestions)
-                $content .= $OUTPUT->pix_icon('noquestions', '', 'block_sibcms', array('class' => 'iconsmall'));
+                $content .= $OUTPUT->pix_icon('noquestions', get_string('key74', 'block_sibcms'), 'block_sibcms', array('class' => 'iconsmall'));
             $table_row_data[] = $content;
 
             $table_row_data[] = $quiz->participants;

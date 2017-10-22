@@ -38,9 +38,9 @@ class activity_assigns_data_table implements \renderable
                 $content = \html_writer::link($assignurl, $content) . '&nbsp;';
             }
             if ($assign->nograde)
-                $content .= $OUTPUT->pix_icon('nograde', '', 'block_sibcms', array('class' => 'iconsmall'));
+                $content .= $OUTPUT->pix_icon('nograde', get_string('key56', 'block_sibcms'), 'block_sibcms', array('class' => 'iconsmall'));
             if ($assign->teamsubmission)
-                $content .= $OUTPUT->pix_icon('i/users', '', '', array('class' => 'iconsmall'));
+                $content .= $OUTPUT->pix_icon('i/users', get_string('key73', 'block_sibcms'), '', array('class' => 'iconsmall'));
             $table_row_data[] = $content;
 
             $table_row_data[] = $assign->teamsubmission ? '—' : $assign->participants;
@@ -53,7 +53,7 @@ class activity_assigns_data_table implements \renderable
             if (!$assign->teamsubmission && !$assign->nograde) {
                 $content = $assign->graded;
                 if ($assign->need_grading > 0) {
-                    $content .= '&nbsp;' . $OUTPUT->pix_icon('alert', '', 'block_sibcms', array('class' => 'icon'));
+                    $content .= '&nbsp;' . $OUTPUT->pix_icon('alert', get_string('key72', 'block_sibcms'), 'block_sibcms', array('class' => 'icon'));
                 }
                 $table_row_data[] = $content;
                 $table_row_data[] = $this->percentformat_value($assign->graded_persent, false);
