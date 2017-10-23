@@ -69,7 +69,7 @@ if ($contextcoursecat) {
 
         $myxls->write_number($index, 10, $course_data->result);
 
-        $comment = '[НЕ ПРОСМАТРИВАЛСЯ АДМИНИСТРАТОРОМ]';
+        $comment = get_string('key76', 'block_sibcms');
         $feedback = \block_sibcms\sibcms_api::get_last_course_feedback($course_data->id);
         if ($feedback) {
             $comment = $feedback->feedback;

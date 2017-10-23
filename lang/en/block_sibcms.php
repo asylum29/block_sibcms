@@ -79,6 +79,5 @@ $string['key72'] = 'Some submissions are not graded';
 $string['key73'] = 'Group mode';
 $string['key74'] = 'No questions';
 $string['key75'] = 'No feedback';
-
 $string['key76'] = 'Course was not graded by administrator';
-$string['key77'] = 'Graded: &nbsp;';
+$string['key77'] = 'Graded:&nbsp;';
