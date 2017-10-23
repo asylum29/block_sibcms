@@ -86,3 +86,7 @@
     padding-left: 10px;
     padding-top: 5px;
 }
+
+#block_sibcms .block_sibcms_monitoringtable .block_sibcms_hints {
+    margin-bottom: 0 !important;
+}

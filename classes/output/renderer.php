@@ -305,7 +305,9 @@ class renderer extends \plugin_renderer_base
                     }
                     $cells[] = \html_writer::alist($notices);
 
-                    $content = ((count($course_data->assigns) > 0) || count($course_data->quiz) > 0) ? \html_writer::div('', 'block_sibcms_showmore') : '';
+                    $hints = sibcms_api::get_hints($course_data);
+                    $content = (count($hints) > 0 || (count($course_data->assigns) > 0) || count($course_data->quiz) > 0) ? // true
+                        \html_writer::div('', 'block_sibcms_showmore') : '';
                     $cells[] = new \html_table_cell($content);
 
                     $row = new \html_table_row($cells);
@@ -313,6 +315,10 @@ class renderer extends \plugin_renderer_base
                     $table->data[] = $row;
 
                     $content = \html_writer::start_div('block_sibcms_coursestats');
+                    if (count($hints) > 0) {
+                        $content .= \html_writer::div(get_string('key29', 'block_sibcms') . ':', 'block_sibcms_modheader');
+                        $content .= \html_writer::alist($hints, array('class' => 'block_sibcms_hints'));
+                    }
                     if (count($course_data->assigns) > 0) {
                         $content .= \html_writer::div(get_string('key37', 'block_sibcms') . ':', 'block_sibcms_modheader');
                         $assign_table = new activity_assigns_data_table($course_data);
