@@ -72,9 +72,13 @@ $string['key65'] = 'Course progress: {$a}';
 $string['key66'] = 'Teacher';
 $string['key67'] = 'Last access to course';
 $string['key68'] = 'Course progress';
-$string['key69'] = 'Report «Course activity» was viewed';
-$string['key70'] = 'Report «Course monitoring» was viewed';
-$string['key71'] = 'Comment editing';
-$string['key72'] = 'Has not graded submissions';
+$string['key69'] = 'Report «Course activity» viewed';
+$string['key70'] = 'Report «Course monitoring» viewed';
+$string['key71'] = 'Feedback created';
+$string['key72'] = 'Some submissions are not graded';
 $string['key73'] = 'Group mode';
 $string['key74'] = 'No questions';
+$string['key75'] = 'No feedback';
+
+$string['key76'] = 'Course was not graded by administrator';
+$string['key77'] = 'Graded: &nbsp;';

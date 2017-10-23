@@ -75,7 +75,7 @@ class renderer extends \plugin_renderer_base
                 if (!empty($feedback)) {
                     $time_ago = format_time(time() - $feedback->timecreated);
                 }
-                $status = \html_writer::span('[НЕТ ОТЗЫВА]', 'red');
+                $status = \html_writer::span(get_string('key75', 'block_sibcms'), 'red');
                 if ($feedback) {
                     if ($feedback->result == 0) {
                         $status = \html_writer::span(get_string('key23', 'block_sibcms'), 'green');
@@ -280,7 +280,7 @@ class renderer extends \plugin_renderer_base
                     if ($feedback) {
                         if (trim($feedback->feedback) != '') {
                             $comment = $feedback->feedback . '<br />';
-                            $comment .= \html_writer::tag('i', '[ПРОСМОТРЕН:]&nbsp;' . userdate($feedback->timecreated, '%d %b %Y, %H:%M'));
+                            $comment .= \html_writer::tag('i', get_string('key77', 'block_sibcms') . userdate($feedback->timecreated, '%d %b %Y, %H:%M'));
                             $notices[] = $comment;
                         }
                         if ($feedback->result == 0) {
@@ -291,7 +291,7 @@ class renderer extends \plugin_renderer_base
                             $class = 'block_sibcms_lightred';
                         }
                     } else {
-                        $notices[] = '[НЕ ПРОСМАТРИВАЛСЯ АДМИНИСТРАТОРОМ]';
+                        $notices[] = get_string('key76', 'block_sibcms');
                     }
                     $content = format_float($course_data->result * 100, 2, true, true) . '%';
                     $content = get_string('key65', 'block_sibcms', $content);

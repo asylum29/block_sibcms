@@ -12,7 +12,7 @@ require_login(1);
 
 require_capability('block/sibcms:monitoring', context_system::instance());
 
-// Ссылка на корень системы
+// System root link
 $PAGE->navbar->add(get_string('key21', 'block_sibcms'), new moodle_url('/blocks/sibcms/category.php'));
 //$PAGE->navbar->add(get_course(1)->shortname, new moodle_url('/blocks/sibcms/category.php'));
 
