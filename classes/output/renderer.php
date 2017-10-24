@@ -61,7 +61,7 @@ class renderer extends \plugin_renderer_base
         global $OUTPUT, $SESSION;
         $result = \html_writer::start_div('', array('id' => 'block_sibcms'));
         if (count($widget->courses) > 0) {
-            if (isset($SESSION) && $SESSION->block_sibcms_no_next_course) {
+            if (isset($SESSION->block_sibcms_no_next_course) && $SESSION->block_sibcms_no_next_course) {
                 $SESSION->block_sibcms_no_next_course = false;
                 $result .= $OUTPUT->notification(get_string('key85', 'block_sibcms'), 'success');
             }

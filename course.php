@@ -66,9 +66,7 @@ if ($mform->is_cancelled()) {
     );
     $event = \block_sibcms\event\comment_created::create(array('objectid' => $course_id, 'other' => array('category' => $category_id)));
     $event->trigger();
-    if (isset($SESSION)) {
-        $SESSION->block_sibcms_lastfeedback = $data->id;
-    }
+    $SESSION->block_sibcms_lastfeedback = $data->id;
     if (!empty($data->submitbutton)) {
         redirect(new moodle_url('/blocks/sibcms/courses.php', array('category' => $category->id, 'page' => $page)));
     }
@@ -77,9 +75,7 @@ if ($mform->is_cancelled()) {
         if (!empty($next_course)) {
             redirect(new moodle_url('/blocks/sibcms/course.php', array('id' => $next_course, 'category' => $category->id)));
         } else {
-            if (isset($SESSION)) {
-                $SESSION->block_sibcms_no_next_course = true;
-            }
+            $SESSION->block_sibcms_no_next_course = true;
             redirect(new moodle_url('/blocks/sibcms/courses.php', array('category' => $category->id, 'page' => $page)));
         }
     }
