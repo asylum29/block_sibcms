@@ -123,12 +123,20 @@ class sibcms_api
             $hints[] = get_string('key53', 'block_sibcms');
         }
 
-        $all_assings_is_grading = true;
+        $all_assings_are_grading = true;
         foreach ($course_data->assigns as $assign) {
-            $all_assings_is_grading &= !$assign->nograde;
+            $all_assings_are_grading &= !$assign->nograde;
         }
-        if (!$all_assings_is_grading) {
+        if (!$all_assings_are_grading) {
             $hints[] = get_string('key54', 'block_sibcms');
+        }
+
+        $all_assings_have_feedbacks = true;
+        foreach ($course_data->assigns as $assign) {
+            $all_assings_have_feedbacks &= (count($assign->feedbacks) > 0);
+        }
+        if (!$all_assings_have_feedbacks) {
+            $hints[] = get_string('key82', 'block_sibcms');
         }
 
         $all_quiz_have_questions = true;
