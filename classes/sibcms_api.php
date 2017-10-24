@@ -103,6 +103,25 @@ class sibcms_api
     }
 
     /**
+     * Get ID of the course that require attention in the certain category
+     * @param $category_id
+     * @return int|null
+     */
+    public static function get_require_attention_course($category_id)
+    {
+        $category = \coursecat::get($category_id);
+        if (!$category)
+            return null;
+        $courses = $category->get_courses(array('recursive' => true));
+        foreach ($courses as $course) {
+            if (sibcms_api::require_attention($course->id)) {
+                return $course->id;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Get all automatic hints for course data
      * @param $course_data
      * @return array

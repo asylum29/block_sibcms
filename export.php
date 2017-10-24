@@ -18,6 +18,7 @@ $contextcourse = context_course::instance($course_id);
 require_capability('block/sibcms:monitoring_report', $contextcourse);
 
 if ($contextcoursecat) {
+
     require_capability('block/sibcms:monitoring_report_category', $contextcoursecat);
 
     $str_monitoring = get_string('key21', 'block_sibcms');
@@ -82,7 +83,7 @@ if ($contextcoursecat) {
     }
 
     $workbook->close();
-    
+
     exit;
 }
 

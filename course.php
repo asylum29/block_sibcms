@@ -16,6 +16,21 @@ require_capability('block/sibcms:monitoring', context_system::instance());
 
 $course = get_course($course_id);
 $category = coursecat::get($category_id);
+
+//Check if the category contains the course
+$courses = $category->get_courses(array('recursive' => true));
+$course_founded = false;
+foreach ($courses as $course) {
+    if ($course->id == $course_id) {
+        $course_founded = true;
+        break;
+    }
+}
+if (!$course_founded) {
+    print_error('key83', 'block_sibcms', '',
+        array('category' => $category_id, 'course' => $course_id));
+}
+
 $PAGE->set_heading($course->fullname);
 $PAGE->navbar->ignore_active();
 $PAGE->navbar->add(get_string('key21', 'block_sibcms'), new moodle_url('/blocks/sibcms/category.php'));
@@ -54,7 +69,20 @@ if ($mform->is_cancelled()) {
     if (isset($SESSION)) {
         $SESSION->block_sibcms_lastfeedback = $data->id;
     }
-    redirect(new moodle_url('/blocks/sibcms/courses.php', array('category' => $category->id, 'page' => $page)));
+    if (!empty($data->submitbutton)) {
+        redirect(new moodle_url('/blocks/sibcms/courses.php', array('category' => $category->id, 'page' => $page)));
+    }
+    if (!empty($data->submitbutton2)) {
+        $next_course = \block_sibcms\sibcms_api::get_require_attention_course($category->id);
+        if (!empty($next_course)) {
+            redirect(new moodle_url('/blocks/sibcms/course.php', array('id' => $next_course, 'category' => $category->id)));
+        } else {
+            if (isset($SESSION)) {
+                $SESSION->block_sibcms_no_next_course = true;
+            }
+            redirect(new moodle_url('/blocks/sibcms/courses.php', array('category' => $category->id, 'page' => $page)));
+        }
+    }
 } else {
     echo $output->header();
 

@@ -35,7 +35,7 @@ $string['key28'] = 'Teachers';
 $string['key29'] = 'Founded errors'; //CHECK
 $string['key30'] = 'Select course check result';
 $string['key31'] = 'Course monitoring result';
-$string['key32'] = 'Save feedback';
+$string['key32'] = 'Save and return to category';
 $string['key33'] = 'Course status';
 $string['key34'] = 'Course feedback';
 $string['key35'] = 'Course comment';
@@ -90,3 +90,7 @@ $string['key80'] = 'The term of feedback relevance for courses with "Сritical e
 $string['key81'] = 'The term of feedback relevance for courses with "Course is empty" status. 
     Course needs attention after this term';
 $string['key82'] = 'Some assigns have no feedbacks';
+$string['key83'] = 'This category with id {$a->category} does not contains the course with id {$a->course}';
+$string['key84'] = 'Save and go to next course';
+$string['key85'] = 'No more courses require attention in this category';
+

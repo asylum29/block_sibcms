@@ -3,6 +3,7 @@
 namespace block_sibcms\output;
 
 use block_sibcms\sibcms_api;
+use core\notification;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -57,10 +58,16 @@ class renderer extends \plugin_renderer_base
      */
     public function render_category_courses_table(category_courses_table $widget)
     {
-        global $OUTPUT;
+        global $OUTPUT, $SESSION;
         $result = \html_writer::start_div('', array('id' => 'block_sibcms'));
         if (count($widget->courses) > 0) {
+            if (isset($SESSION) && $SESSION->block_sibcms_no_next_course) {
+                $SESSION->block_sibcms_no_next_course = false;
+                $result .= $OUTPUT->notification(get_string('key85', 'block_sibcms'), 'success');
+            }
+
             $table = new \html_table();
+            $table->attributes = array('class' => 'table');
             $table->head = array(
                 '',
                 get_string('key10', 'block_sibcms'),
