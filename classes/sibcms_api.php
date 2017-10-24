@@ -76,20 +76,27 @@ class sibcms_api
         if (!$last_feedback) {
             return true;
         }
+        
+        $time_ago = time() - $last_feedback->timecreated;
+
         // Course has no errors - 15 day
-        if ($last_feedback->result == 0 && time() - $last_feedback->timecreated > 3600 * 24 * 15) {
+        if ($last_feedback->result == 0 &&
+            $time_ago > get_config('block_sibcms', 'no_errors_relevance_duration')) {
             return true;
         }
-        // Course has not critical errors - 7 days
-        if ($last_feedback->result == 1 && time() - $last_feedback->timecreated > 3600 * 24 * 7) {
+        // Course has not critical errors
+        if ($last_feedback->result == 1 &&
+            $time_ago > get_config('block_sibcms', 'not_critical_errors_relevance_duration')) {
             return true;
         }
-        // Course has critical errors - 3 days
-        if ($last_feedback->result == 2 && time() - $last_feedback->timecreated > 3600 * 24 * 3) {
+        // Course has critical errors
+        if ($last_feedback->result == 2 &&
+            $time_ago > get_config('block_sibcms', 'critical_errors_relevance_duration')) {
             return true;
         }
-        // Course is empty - 3 days
-        if ($last_feedback->result == 3 && time() - $last_feedback->timecreated > 3600 * 24 * 3) {
+        // Course is empty
+        if ($last_feedback->result == 3 &&
+            $time_ago > get_config('block_sibcms', 'empty_course_relevance_duration')) {
             return true;
         }
         return false;

@@ -81,3 +81,11 @@ $string['key74'] = 'No questions';
 $string['key75'] = 'No feedback';
 $string['key76'] = 'Course was not graded by administrator';
 $string['key77'] = 'Graded:&nbsp;';
+$string['key78'] = 'The term of feedback relevance for courses with "No errors" status. 
+    Course needs attention after this term';
+$string['key79'] = 'The term of feedback relevance for courses with "Not critical errors status. 
+    Course needs attention after this term';
+$string['key80'] = 'The term of feedback relevance for courses with "Сritical errors" status. 
+    Course needs attention after this term';
+$string['key81'] = 'The term of feedback relevance for courses with "Course is empty" status. 
+    Course needs attention after this term';
