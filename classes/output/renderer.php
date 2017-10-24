@@ -58,7 +58,7 @@ class renderer extends \plugin_renderer_base
     public function render_category_courses_table(category_courses_table $widget)
     {
         global $OUTPUT;
-        $result = '';
+        $result = \html_writer::start_div('', array('id' => 'block_sibcms'));
         if (count($widget->courses) > 0) {
             $table = new \html_table();
             $table->head = array(
@@ -106,6 +106,11 @@ class renderer extends \plugin_renderer_base
                         )
                     )
                 );
+                if ($widget->last_feedback == $course->id) {
+                    $table->rowclasses[] = 'block_sibcms_lastfeedback';
+                } else {
+                    $table->rowclasses[] = '';
+                }
             }
             $result .= \html_writer::table($table);
             $result .= $OUTPUT->paging_bar($widget->courses_count, $widget->page, 20,
@@ -113,6 +118,7 @@ class renderer extends \plugin_renderer_base
         } else {
             $result .= $OUTPUT->heading(get_string('key6', 'block_sibcms'));
         }
+        $result .= \html_writer::end_div();
         return $result;
     }
 

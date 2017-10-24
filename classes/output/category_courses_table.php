@@ -10,8 +10,9 @@ class category_courses_table implements \renderable
     public $page;
     public $courses_count;
     public $category_id;
+    public $last_feedback;
 
-    public function __construct($category_id, $page)
+    public function __construct($category_id, $page, $last_feedback)
     {
         $category = \coursecat::get($category_id);
         $this->category_id = $category_id;
@@ -19,6 +20,7 @@ class category_courses_table implements \renderable
         $courses_count = $category->get_courses_count(array('recursive' => true));
         $this->courses_count = $courses_count;
         $this->courses = $category->get_courses(array('recursive' => true, 'offset' => $page * 20, 'limit' => 20));
+        $this->last_feedback = $last_feedback;
     }
 
 }
