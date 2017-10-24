@@ -113,7 +113,13 @@ class feedback_form extends \moodleform
         $mform->addElement('textarea', 'comment', get_string('key35', 'block_sibcms'), 'wrap="virtual" cols="50" rows="3"');
 
         // Buttons
-        $this->add_action_buttons($cancel = true, $submitlabel = get_string('key32', 'block_sibcms'));
+        $buttonarray = array();
+        $buttonarray[] = &$mform->createElement('submit', 'submitbutton', get_string('key32', 'block_sibcms'));
+        $buttonarray[] = &$mform->createElement('submit', 'submitbutton2', get_string('key84', 'block_sibcms'));
+        $buttonarray[] = &$mform->createElement('cancel');
+        $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
+        $mform->setType('buttonar', PARAM_RAW);
+        $mform->closeHeaderBefore('buttonar');
     }
 
     function validation($data, $files)

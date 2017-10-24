@@ -69,7 +69,20 @@ if ($mform->is_cancelled()) {
     if (isset($SESSION)) {
         $SESSION->block_sibcms_lastfeedback = $data->id;
     }
-    redirect(new moodle_url('/blocks/sibcms/courses.php', array('category' => $category->id, 'page' => $page)));
+    if (!empty($data->submitbutton)) {
+        redirect(new moodle_url('/blocks/sibcms/courses.php', array('category' => $category->id, 'page' => $page)));
+    }
+    if (!empty($data->submitbutton2)) {
+        $next_course = \block_sibcms\sibcms_api::get_require_attention_course($category->id);
+        if (!empty($next_course)) {
+            redirect(new moodle_url('/blocks/sibcms/course.php', array('id' => $next_course, 'category' => $category->id)));
+        } else {
+            if (isset($SESSION)) {
+                $SESSION->block_sibcms_no_next_course = true;
+            }
+            redirect(new moodle_url('/blocks/sibcms/courses.php', array('category' => $category->id, 'page' => $page)));
+        }
+    }
 } else {
     echo $output->header();
 
