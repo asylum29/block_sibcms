@@ -90,3 +90,4 @@ $string['key80'] = 'The term of feedback relevance for courses with "Сritical e
 $string['key81'] = 'The term of feedback relevance for courses with "Course is empty" status. 
     Course needs attention after this term';
 $string['key82'] = 'Some assigns have no feedbacks';
+$string['key83'] = 'This category with id {$a->category} does not contains the course with id {$a->course}';

@@ -16,6 +16,21 @@ require_capability('block/sibcms:monitoring', context_system::instance());
 
 $course = get_course($course_id);
 $category = coursecat::get($category_id);
+
+//Check if the category contains the course
+$courses = $category->get_courses(array('recursive' => true));
+$course_founded = false;
+foreach ($courses as $course) {
+    if ($course->id == $course_id) {
+        $course_founded = true;
+        break;
+    }
+}
+if (!$course_founded) {
+    print_error('key83', 'block_sibcms', '',
+        array('category' => $category_id, 'course' => $course_id));
+}
+
 $PAGE->set_heading($course->fullname);
 $PAGE->navbar->ignore_active();
 $PAGE->navbar->add(get_string('key21', 'block_sibcms'), new moodle_url('/blocks/sibcms/category.php'));
