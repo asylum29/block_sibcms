@@ -34,7 +34,7 @@ $PAGE->set_title(get_string('key22', 'block_sibcms', array('name' => $category->
 $output = $PAGE->get_renderer('block_sibcms');
 
 $last_feedback = null;
-if (isset($SESSION) && isset($SESSION->block_sibcms_lastfeedback)) {
+if (isset($SESSION->block_sibcms_lastfeedback)) {
     $last_feedback = $SESSION->block_sibcms_lastfeedback;
 }
 

@@ -16,7 +16,7 @@ function block_sibcms_extend_navigation_course(navigation_node $navigation, $cou
         $navigation = $navigation->add(get_string('key20', 'block_sibcms'), null, navigation_node::TYPE_CONTAINER, null, 'sibcms_reports', new pix_icon('i/stats', ''));
     }
 
-    if ($activity_report) {
+    if ($activity_report && $course->id != 1) {
         $url = new moodle_url('/blocks/sibcms/report.php', array('id' => $course->id));
         $navigation->add(get_string('key61', 'block_sibcms'), $url, navigation_node::TYPE_SETTING, null, null, new pix_icon('i/report', ''));
     }
@@ -27,7 +27,7 @@ function block_sibcms_extend_navigation_course(navigation_node $navigation, $cou
         $navigation->add(get_string('key21', 'block_sibcms'), $url, navigation_node::TYPE_SETTING, null, null, new pix_icon('i/report', ''));
     }
 
-    if ($monitoring) {
+    if ($monitoring && $course->id != 1) {
         $url = new moodle_url('/blocks/sibcms/course.php', array('id' => $course->id, 'category' => $course->category));
         $navigation->add(get_string('key19', 'block_sibcms'), $url, navigation_node::TYPE_SETTING, null, null, new pix_icon('monitoring', '', 'block_sibcms'));
     }
