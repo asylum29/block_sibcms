@@ -61,6 +61,7 @@ class renderer extends \plugin_renderer_base
         $result = \html_writer::start_div('', array('id' => 'block_sibcms'));
         if (count($widget->courses) > 0) {
             $table = new \html_table();
+            $table->attributes = array('class' => 'table');
             $table->head = array(
                 '',
                 get_string('key10', 'block_sibcms'),
