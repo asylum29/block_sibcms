@@ -33,7 +33,12 @@ $PAGE->set_title(get_string('key22', 'block_sibcms', array('name' => $category->
 
 $output = $PAGE->get_renderer('block_sibcms');
 
-$category_table = new block_sibcms\output\category_courses_table($category_id, $page);
+$last_feedback = null;
+if (isset($SESSION) && isset($SESSION->block_sibcms_lastfeedback)) {
+    $last_feedback = $SESSION->block_sibcms_lastfeedback;
+}
+
+$category_table = new block_sibcms\output\category_courses_table($category_id, $page, $last_feedback);
 
 echo $output->header();
 
