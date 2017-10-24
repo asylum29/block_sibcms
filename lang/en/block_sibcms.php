@@ -57,7 +57,7 @@ $string['key50'] = 'No graders';
 $string['key51'] = 'No students enrolled';
 $string['key52'] = 'No one file in the course';
 $string['key53'] = 'No one assign or test in the course';
-$string['key54'] = 'Some assings have no grades';
+$string['key54'] = 'Some assigns have no grades';
 $string['key55'] = 'Some quiz have no questions';
 $string['key56'] = 'No grade';
 $string['key57'] = 'Points: {$a->points}';
@@ -89,3 +89,4 @@ $string['key80'] = 'The term of feedback relevance for courses with "Сritical e
     Course needs attention after this term';
 $string['key81'] = 'The term of feedback relevance for courses with "Course is empty" status. 
     Course needs attention after this term';
+$string['key82'] = 'Some assigns have no feedbacks';
