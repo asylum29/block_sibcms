@@ -25,9 +25,9 @@ class feedback_form extends \moodleform
         $mform->addElement('hidden', 'category', null);
         $mform->setType('category', PARAM_INT);
 
-        // Page
-        $mform->addElement('hidden', 'page', null);
-        $mform->setType('page', PARAM_INT);
+        // Return url
+        $mform->addElement('hidden', 'returnurl', null);
+        $mform->setType('returnurl', PARAM_URL);
 
         // Course link
         $course_url = new \moodle_url('/course/view.php', array('id' => $course_data->id));

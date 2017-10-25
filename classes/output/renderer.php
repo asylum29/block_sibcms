@@ -58,7 +58,7 @@ class renderer extends \plugin_renderer_base
      */
     public function render_category_courses_table(category_courses_table $widget)
     {
-        global $OUTPUT, $SESSION;
+        global $OUTPUT, $SESSION, $PAGE;
         $result = \html_writer::start_div('', array('id' => 'block_sibcms'));
         if (count($widget->courses) > 0) {
             if (isset($SESSION->block_sibcms_no_next_course) && $SESSION->block_sibcms_no_next_course) {
@@ -106,9 +106,9 @@ class renderer extends \plugin_renderer_base
                     \html_writer::tag('a', get_string('key19', 'block_sibcms'),
                         array(
                             'href' => new \moodle_url('/blocks/sibcms/course.php', array(
-                                'id'       => $course->id,
-                                'category' => $widget->category_id,
-                                'page'     => $widget->page
+                                'id'        => $course->id,
+                                'category'  => $widget->category_id,
+                                'returnurl' => $PAGE->url
                             ))
                         )
                     )
@@ -310,7 +310,7 @@ class renderer extends \plugin_renderer_base
                     $content = get_string('key65', 'block_sibcms', $content);
                     $notices[] = \html_writer::tag('b', $content);
                     if (has_capability('block/sibcms:monitoring', \context_system::instance())) {
-                        $params = array('id' => $course->id, 'category' => $course->category);
+                        $params = array('id' => $course->id, 'category' => $course->category, 'returnurl' => $PAGE->url);
                         $course_url = new \moodle_url("$CFG->wwwroot/blocks/sibcms/course.php", $params);
                         $content = \html_writer::link($course_url, get_string('key19', 'block_sibcms'), array('target' => '_blank'));
                         $content .= '&nbsp;' . $OUTPUT->pix_icon('monitoring', '', 'block_sibcms', array('class' => 'iconsmall'));
