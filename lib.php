@@ -7,6 +7,8 @@ require_once($CFG->libdir.'/coursecatlib.php');
 // Link to feedback form page
 function block_sibcms_extend_navigation_course(navigation_node $navigation, $course, $context)
 {
+    global $PAGE;
+
     $monitoring        = has_capability('block/sibcms:monitoring', context_system::instance());
     $activity_report   = has_capability('block/sibcms:activity_report', $context);
     $monitoring_report = has_capability('block/sibcms:monitoring_report', $context) &&
@@ -28,7 +30,8 @@ function block_sibcms_extend_navigation_course(navigation_node $navigation, $cou
     }
 
     if ($monitoring && $course->id != 1) {
-        $url = new moodle_url('/blocks/sibcms/course.php', array('id' => $course->id, 'category' => $course->category));
+        $url = new moodle_url('/blocks/sibcms/course.php',
+            array('id' => $course->id, 'category' => $course->category, 'returnurl' => $PAGE->url));
         $navigation->add(get_string('key19', 'block_sibcms'), $url, navigation_node::TYPE_SETTING, null, null, new pix_icon('monitoring', '', 'block_sibcms'));
     }
 }

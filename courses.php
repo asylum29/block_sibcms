@@ -6,7 +6,7 @@ require_once ('../../lib/coursecatlib.php');
 $category_id = required_param('category', PARAM_INT);
 $page = optional_param('page', 0, PARAM_INT);
 
-$PAGE->set_url(new moodle_url('/blocks/sibcms/courses.php', array('category' => $category_id)));
+$PAGE->set_url(new moodle_url('/blocks/sibcms/courses.php', array('category' => $category_id, 'page' => $page)));
 
 require_login(1);
 

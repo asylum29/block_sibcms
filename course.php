@@ -6,7 +6,8 @@ require_once("$CFG->libdir/formslib.php");
 
 $course_id   = required_param('id', PARAM_INT);
 $category_id = required_param('category', PARAM_INT);
-$page        = optional_param('page', 0, PARAM_INT);
+$return_url  = optional_param('returnurl',
+    new moodle_url('/blocks/sibcms/courses.php', array('category' => $category_id)), PARAM_URL);
 
 $PAGE->set_url(new moodle_url('/blocks/sibcms/course.php', array('id' => $course_id, 'category' => $category_id)));
 
@@ -56,7 +57,7 @@ $custom_data = array(
 $mform = new block_sibcms\feedback_form(null, $custom_data);
 
 if ($mform->is_cancelled()) {
-    redirect(new moodle_url('/blocks/sibcms/courses.php', array('category' => $category->id, 'page' => $page)));
+    redirect($return_url);
 } else if ($data = $mform->get_data()) {
     \block_sibcms\sibcms_api::save_feedback(
         $data->id,
@@ -68,7 +69,7 @@ if ($mform->is_cancelled()) {
     $event->trigger();
     $SESSION->block_sibcms_lastfeedback = $data->id;
     if (!empty($data->submitbutton)) {
-        redirect(new moodle_url('/blocks/sibcms/courses.php', array('category' => $category->id, 'page' => $page)));
+        redirect($return_url);
     }
     if (!empty($data->submitbutton2)) {
         $next_course = \block_sibcms\sibcms_api::get_require_attention_course($category->id);
@@ -76,19 +77,19 @@ if ($mform->is_cancelled()) {
             redirect(new moodle_url('/blocks/sibcms/course.php', array('id' => $next_course, 'category' => $category->id)));
         } else {
             $SESSION->block_sibcms_no_next_course = true;
-            redirect(new moodle_url('/blocks/sibcms/courses.php', array('category' => $category->id, 'page' => $page)));
+            redirect($return_url);
         }
     }
 } else {
     echo $output->header();
 
     $params = array(
-        'id'       => $course_id,
-        'category' => $category_id,
-        'page'     => $page,
-        'result'   => '',
-        'feedback' => '',
-        'comment'  => ''
+        'id'        => $course_id,
+        'category'  => $category_id,
+        'returnurl' => $return_url,
+        'result'    => '',
+        'feedback'  => '',
+        'comment'   => ''
     );
     $last_feedback = block_sibcms\sibcms_api::get_last_course_feedback($course_id);
     if ($last_feedback) {
