@@ -1,4 +1,26 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * block_sibcms
+ *
+ * @package    block_sibcms
+ * @copyright  2017 Sergey Shlyanin, Aleksandr Raetskiy <ksenon3@mail.ru>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 namespace block_sibcms;
 
@@ -25,9 +47,9 @@ class feedback_form extends \moodleform
         $mform->addElement('hidden', 'category', null);
         $mform->setType('category', PARAM_INT);
 
-        // Page
-        $mform->addElement('hidden', 'page', null);
-        $mform->setType('page', PARAM_INT);
+        // Return url
+        $mform->addElement('hidden', 'returnurl', null);
+        $mform->setType('returnurl', PARAM_URL);
 
         // Course link
         $course_url = new \moodle_url('/course/view.php', array('id' => $course_data->id));
@@ -113,7 +135,13 @@ class feedback_form extends \moodleform
         $mform->addElement('textarea', 'comment', get_string('key35', 'block_sibcms'), 'wrap="virtual" cols="50" rows="3"');
 
         // Buttons
-        $this->add_action_buttons($cancel = true, $submitlabel = get_string('key32', 'block_sibcms'));
+        $buttonarray = array();
+        $buttonarray[] = &$mform->createElement('submit', 'submitbutton', get_string('key32', 'block_sibcms'));
+        $buttonarray[] = &$mform->createElement('submit', 'submitbutton2', get_string('key84', 'block_sibcms'));
+        $buttonarray[] = &$mform->createElement('cancel');
+        $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
+        $mform->setType('buttonar', PARAM_RAW);
+        $mform->closeHeaderBefore('buttonar');
     }
 
     function validation($data, $files)

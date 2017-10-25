@@ -1,4 +1,26 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * block_sibcms
+ *
+ * @package    block_sibcms
+ * @copyright  2017 Sergey Shlyanin, Aleksandr Raetskiy <ksenon3@mail.ru>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 namespace block_sibcms;
 
@@ -76,23 +98,49 @@ class sibcms_api
         if (!$last_feedback) {
             return true;
         }
+        
+        $time_ago = time() - $last_feedback->timecreated;
+
         // Course has no errors - 15 day
-        if ($last_feedback->result == 0 && time() - $last_feedback->timecreated > 3600 * 24 * 15) {
+        if ($last_feedback->result == 0 &&
+            $time_ago > get_config('block_sibcms', 'no_errors_relevance_duration')) {
             return true;
         }
-        // Course has not critical errors - 7 days
-        if ($last_feedback->result == 1 && time() - $last_feedback->timecreated > 3600 * 24 * 7) {
+        // Course has not critical errors
+        if ($last_feedback->result == 1 &&
+            $time_ago > get_config('block_sibcms', 'not_critical_errors_relevance_duration')) {
             return true;
         }
-        // Course has critical errors - 3 days
-        if ($last_feedback->result == 2 && time() - $last_feedback->timecreated > 3600 * 24 * 3) {
+        // Course has critical errors
+        if ($last_feedback->result == 2 &&
+            $time_ago > get_config('block_sibcms', 'critical_errors_relevance_duration')) {
             return true;
         }
-        // Course is empty - 3 days
-        if ($last_feedback->result == 3 && time() - $last_feedback->timecreated > 3600 * 24 * 3) {
+        // Course is empty
+        if ($last_feedback->result == 3 &&
+            $time_ago > get_config('block_sibcms', 'empty_course_relevance_duration')) {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Get ID of the course that require attention in the certain category
+     * @param $category_id
+     * @return int|null
+     */
+    public static function get_require_attention_course($category_id)
+    {
+        $category = \coursecat::get($category_id);
+        if (!$category)
+            return null;
+        $courses = $category->get_courses(array('recursive' => true));
+        foreach ($courses as $course) {
+            if (sibcms_api::require_attention($course->id)) {
+                return $course->id;
+            }
+        }
+        return null;
     }
 
     /**
@@ -116,12 +164,20 @@ class sibcms_api
             $hints[] = get_string('key53', 'block_sibcms');
         }
 
-        $all_assings_is_grading = true;
+        $all_assings_are_grading = true;
         foreach ($course_data->assigns as $assign) {
-            $all_assings_is_grading &= !$assign->nograde;
+            $all_assings_are_grading &= !$assign->nograde;
         }
-        if (!$all_assings_is_grading) {
+        if (!$all_assings_are_grading) {
             $hints[] = get_string('key54', 'block_sibcms');
+        }
+
+        $all_assings_have_feedbacks = true;
+        foreach ($course_data->assigns as $assign) {
+            $all_assings_have_feedbacks &= (count($assign->feedbacks) > 0);
+        }
+        if (!$all_assings_have_feedbacks) {
+            $hints[] = get_string('key82', 'block_sibcms');
         }
 
         $all_quiz_have_questions = true;

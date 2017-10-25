@@ -1,4 +1,26 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * block_sibcms
+ *
+ * @package    block_sibcms
+ * @copyright  2017 Sergey Shlyanin, Aleksandr Raetskiy <ksenon3@mail.ru>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 namespace block_sibcms\output;
 
@@ -57,10 +79,16 @@ class renderer extends \plugin_renderer_base
      */
     public function render_category_courses_table(category_courses_table $widget)
     {
-        global $OUTPUT;
-        $result = '';
+        global $OUTPUT, $SESSION, $PAGE;
+        $result = \html_writer::start_div('', array('id' => 'block_sibcms'));
         if (count($widget->courses) > 0) {
+            if (isset($SESSION->block_sibcms_no_next_course) && $SESSION->block_sibcms_no_next_course) {
+                $SESSION->block_sibcms_no_next_course = false;
+                $result .= $OUTPUT->notification(get_string('key85', 'block_sibcms'), 'success');
+            }
+
             $table = new \html_table();
+            $table->attributes = array('class' => 'table');
             $table->head = array(
                 '',
                 get_string('key10', 'block_sibcms'),
@@ -75,7 +103,7 @@ class renderer extends \plugin_renderer_base
                 if (!empty($feedback)) {
                     $time_ago = format_time(time() - $feedback->timecreated);
                 }
-                $status = \html_writer::span('[НЕТ ОТЗЫВА]', 'red');
+                $status = \html_writer::span(get_string('key75', 'block_sibcms'), 'red');
                 if ($feedback) {
                     if ($feedback->result == 0) {
                         $status = \html_writer::span(get_string('key23', 'block_sibcms'), 'green');
@@ -99,13 +127,18 @@ class renderer extends \plugin_renderer_base
                     \html_writer::tag('a', get_string('key19', 'block_sibcms'),
                         array(
                             'href' => new \moodle_url('/blocks/sibcms/course.php', array(
-                                'id'       => $course->id,
-                                'category' => $widget->category_id,
-                                'page'     => $widget->page
+                                'id'        => $course->id,
+                                'category'  => $widget->category_id,
+                                'returnurl' => $PAGE->url
                             ))
                         )
                     )
                 );
+                if ($widget->last_feedback == $course->id) {
+                    $table->rowclasses[] = 'block_sibcms_lastfeedback';
+                } else {
+                    $table->rowclasses[] = '';
+                }
             }
             $result .= \html_writer::table($table);
             $result .= $OUTPUT->paging_bar($widget->courses_count, $widget->page, 20,
@@ -113,6 +146,7 @@ class renderer extends \plugin_renderer_base
         } else {
             $result .= $OUTPUT->heading(get_string('key6', 'block_sibcms'));
         }
+        $result .= \html_writer::end_div();
         return $result;
     }
 
@@ -166,7 +200,7 @@ class renderer extends \plugin_renderer_base
 
         $graders = $course_data->graders;
         if (count($graders) > 0) {
-            $result .= $OUTPUT->heading(get_string('key28', 'block_sibcms'), 3);
+            $result .= $OUTPUT->heading(get_string('key28', 'block_sibcms') . ':', 3);
 
             $table = new \html_table();
             $table->attributes['class'] = 'generaltable block_sibcms_gradertable';
@@ -193,14 +227,21 @@ class renderer extends \plugin_renderer_base
             $result .= \html_writer::table($table);
         }
 
+        $feedback = sibcms_api::get_last_course_feedback($course_data->id);
+        if ($feedback && trim($feedback->feedback) != '') {
+            $content = get_string('key29', 'block_sibcms') . '&nbsp;(' . userdate($feedback->timecreated, '%d %b %Y, %H:%M') . ')';
+            $result .= $OUTPUT->heading($content . ':', 3);
+            $result .= \html_writer::div($feedback->feedback);
+        }
+
         if (count($course_data->assigns) > 0) {
-            $result .= $OUTPUT->heading(get_string('key37', 'block_sibcms'), 3);
+            $result .= $OUTPUT->heading(get_string('key37', 'block_sibcms') . ':', 3);
             $assign_table = new activity_assigns_data_table($course_data);
             $result .= $this->render($assign_table);
         }
 
         if (count($course_data->quiz) > 0) {
-            $result .= $OUTPUT->heading(get_string('key36', 'block_sibcms'), 3);
+            $result .= $OUTPUT->heading(get_string('key36', 'block_sibcms') . ':', 3);
             $quiz_table = new activity_quiz_data_table($course_data);
             $result .= $this->render($quiz_table);
         }
@@ -280,7 +321,7 @@ class renderer extends \plugin_renderer_base
                     if ($feedback) {
                         if (trim($feedback->feedback) != '') {
                             $comment = $feedback->feedback . '<br />';
-                            $comment .= \html_writer::tag('i', '[ПРОСМОТРЕН:]&nbsp;' . userdate($feedback->timecreated, '%d %b %Y, %H:%M'));
+                            $comment .= \html_writer::tag('i', get_string('key77', 'block_sibcms') . userdate($feedback->timecreated, '%d %b %Y, %H:%M'));
                             $notices[] = $comment;
                         }
                         if ($feedback->result == 0) {
@@ -291,13 +332,13 @@ class renderer extends \plugin_renderer_base
                             $class = 'block_sibcms_lightred';
                         }
                     } else {
-                        $notices[] = '[НЕ ПРОСМАТРИВАЛСЯ АДМИНИСТРАТОРОМ]';
+                        $notices[] = get_string('key76', 'block_sibcms');
                     }
                     $content = format_float($course_data->result * 100, 2, true, true) . '%';
                     $content = get_string('key65', 'block_sibcms', $content);
                     $notices[] = \html_writer::tag('b', $content);
                     if (has_capability('block/sibcms:monitoring', \context_system::instance())) {
-                        $params = array('id' => $course->id, 'category' => $course->category);
+                        $params = array('id' => $course->id, 'category' => $course->category, 'returnurl' => $PAGE->url);
                         $course_url = new \moodle_url("$CFG->wwwroot/blocks/sibcms/course.php", $params);
                         $content = \html_writer::link($course_url, get_string('key19', 'block_sibcms'), array('target' => '_blank'));
                         $content .= '&nbsp;' . $OUTPUT->pix_icon('monitoring', '', 'block_sibcms', array('class' => 'iconsmall'));

@@ -1,4 +1,26 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * block_sibcms
+ *
+ * @package    block_sibcms
+ * @copyright  2017 Sergey Shlyanin, Aleksandr Raetskiy <ksenon3@mail.ru>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 require_once('../../config.php');
 require_once($CFG->libdir.'/coursecatlib.php');
@@ -17,7 +39,10 @@ require_login($course);
 $contextcourse = context_course::instance($course_id);
 require_capability('block/sibcms:monitoring_report', $contextcourse);
 
+$monitoring = has_capability('block/sibcms:monitoring', context_system::instance());
+
 if ($contextcoursecat) {
+
     require_capability('block/sibcms:monitoring_report_category', $contextcoursecat);
 
     $str_monitoring = get_string('key21', 'block_sibcms');
@@ -38,6 +63,9 @@ if ($contextcoursecat) {
     $myxls->write_string(0, 9, get_string('key49', 'block_sibcms'));
     $myxls->write_string(0, 10, get_string('key68', 'block_sibcms'));
     $myxls->write_string(0, 11, get_string('key29', 'block_sibcms'));
+    if ($monitoring) {
+        $myxls->write_string(0, 12, get_string('key35', 'block_sibcms'));
+    }
 
     $index = 1;
     $courses = coursecat::get($category_id)->get_courses(array('recursive' => true));
@@ -69,20 +97,27 @@ if ($contextcoursecat) {
 
         $myxls->write_number($index, 10, $course_data->result);
 
-        $comment = '[НЕ ПРОСМАТРИВАЛСЯ АДМИНИСТРАТОРОМ]';
-        $feedback = \block_sibcms\sibcms_api::get_last_course_feedback($course_data->id);
-        if ($feedback) {
-            $comment = $feedback->feedback;
+        $comment = '';
+        $feedback = get_string('key76', 'block_sibcms');
+        $feedback_data = \block_sibcms\sibcms_api::get_last_course_feedback($course_data->id);
+        if ($feedback_data) {
+            $comment = $feedback_data->comment;
+            $feedback = $feedback_data->feedback;
         }
-        $myxls->write_string($index, 11, $comment);
+        $myxls->write_string($index, 11, $feedback);
 
-        $myxls->write_string($index, 12, "$CFG->wwwroot/course/view.php?id=$course->id");
+        $temp = 12;
+        if ($monitoring) {
+            $myxls->write_string($index, $temp++, $comment);
+        }
+
+        $myxls->write_string($index, $temp, "$CFG->wwwroot/course/view.php?id=$course->id");
 
         $index++;
     }
 
     $workbook->close();
-    
+
     exit;
 }
 

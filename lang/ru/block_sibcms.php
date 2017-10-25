@@ -1,4 +1,26 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * block_sibcms
+ *
+ * @package    block_sibcms
+ * @copyright  2017 Sergey Shlyanin, Aleksandr Raetskiy <ksenon3@mail.ru>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 $string['pluginname'] = 'Система мониторинга курсов';
 $string['sibcms:myaddinstance'] = 'Добавлять новый блок «Мониторинг курсов» на домашнюю страницу';
@@ -35,7 +57,7 @@ $string['key28'] = 'Преподаватели';
 $string['key29'] = 'Обнаруженные замечания';
 $string['key30'] = 'Выберите результат проверки курса';
 $string['key31'] = 'Результат проверки курса';
-$string['key32'] = 'Сохранить отзыв';
+$string['key32'] = 'Сохранить и вернуться';
 $string['key33'] = 'Состояние курса';
 $string['key34'] = 'Отзыв о курсе';
 $string['key35'] = 'Комментарий к курсу';
@@ -74,7 +96,22 @@ $string['key67'] = 'Последний доступ к курсу';
 $string['key68'] = 'Завершенность курса';
 $string['key69'] = 'Отчет «Работа в курсе» просмотрен';
 $string['key70'] = 'Отчет «Мониторинг курсов» просмотрен';
-$string['key71'] = 'Комментарий создан';
+$string['key71'] = 'Отзыв создан';
 $string['key72'] = 'Есть неоцененные работы';
 $string['key73'] = 'Групповой режим';
 $string['key74'] = 'Без вопросов';
+$string['key75'] = 'Нет отзыва';
+$string['key76'] = 'Курс не просматривался администратором';
+$string['key77'] = 'Просмотрен:&nbsp;';
+$string['key78'] = 'Время актуальности отзывов со статусом курса "Без замечаний". 
+    По истечении это срока курс требует внимания';
+$string['key79'] = 'Время актуальности отзывов со статусом курса "Некритичные замечания". 
+    По истечении это срока курс требует внимания';
+$string['key80'] = 'Время актуальности отзывов со статусом курса "Критичные замечания". 
+    По истечении это срока курс требует внимания';
+$string['key81'] = 'Время актуальности отзывов со статусом курса "Курс не заполнен". 
+    По истечении это срока курс требует внимания';
+$string['key82'] = 'В некоторых заданиях отключены отзывы';
+$string['key83'] = 'Категория с id {$a->category} не содержит курс с id {$a->course}';
+$string['key84'] = 'Сохранить и перейти к следующему курсу';
+$string['key85'] = 'В категории больше нет курсов, требующих внимания';

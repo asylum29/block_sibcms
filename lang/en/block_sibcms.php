@@ -1,4 +1,26 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * block_sibcms
+ *
+ * @package    block_sibcms
+ * @copyright  2017 Sergey Shlyanin, Aleksandr Raetskiy <ksenon3@mail.ru>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 $string['pluginname'] = 'Course monitoring system';
 $string['sibcms:myaddinstance'] = 'Add a new Course monitoring block to My home';
@@ -35,7 +57,7 @@ $string['key28'] = 'Teachers';
 $string['key29'] = 'Founded errors'; //CHECK
 $string['key30'] = 'Select course check result';
 $string['key31'] = 'Course monitoring result';
-$string['key32'] = 'Save feedback';
+$string['key32'] = 'Save and return';
 $string['key33'] = 'Course status';
 $string['key34'] = 'Course feedback';
 $string['key35'] = 'Course comment';
@@ -57,7 +79,7 @@ $string['key50'] = 'No graders';
 $string['key51'] = 'No students enrolled';
 $string['key52'] = 'No one file in the course';
 $string['key53'] = 'No one assign or test in the course';
-$string['key54'] = 'Some assings have no grades';
+$string['key54'] = 'Some assigns have no grades';
 $string['key55'] = 'Some quiz have no questions';
 $string['key56'] = 'No grade';
 $string['key57'] = 'Points: {$a->points}';
@@ -72,9 +94,25 @@ $string['key65'] = 'Course progress: {$a}';
 $string['key66'] = 'Teacher';
 $string['key67'] = 'Last access to course';
 $string['key68'] = 'Course progress';
-$string['key69'] = 'Report «Course activity» was viewed';
-$string['key70'] = 'Report «Course monitoring» was viewed';
-$string['key71'] = 'Comment editing';
-$string['key72'] = 'Has not graded submissions';
+$string['key69'] = 'Report «Course activity» viewed';
+$string['key70'] = 'Report «Course monitoring» viewed';
+$string['key71'] = 'Feedback created';
+$string['key72'] = 'Some submissions are not graded';
 $string['key73'] = 'Group mode';
 $string['key74'] = 'No questions';
+$string['key75'] = 'No feedback';
+$string['key76'] = 'Course was not graded by administrator';
+$string['key77'] = 'Graded:&nbsp;';
+$string['key78'] = 'The term of feedback relevance for courses with "No errors" status. 
+    Course needs attention after this term';
+$string['key79'] = 'The term of feedback relevance for courses with "Not critical errors status. 
+    Course needs attention after this term';
+$string['key80'] = 'The term of feedback relevance for courses with "Сritical errors" status. 
+    Course needs attention after this term';
+$string['key81'] = 'The term of feedback relevance for courses with "Course is empty" status. 
+    Course needs attention after this term';
+$string['key82'] = 'Some assigns have no feedbacks';
+$string['key83'] = 'This category with id {$a->category} does not contains the course with id {$a->course}';
+$string['key84'] = 'Save and go to next course';
+$string['key85'] = 'No more courses require attention in this category';
+

@@ -90,3 +90,7 @@
 #block_sibcms .block_sibcms_monitoringtable .block_sibcms_hints {
     margin-bottom: 0 !important;
 }
+
+#block_sibcms .block_sibcms_lastfeedback {
+    background-color: rgb(255, 221, 117);
+}
