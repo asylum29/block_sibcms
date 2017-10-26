@@ -24,8 +24,6 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-require_once($CFG->dirroot . '/mod/assign/adminlib.php');
-
 if ($ADMIN->fulltree) {
 
     $name = get_string('key23', 'block_sibcms');
