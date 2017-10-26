@@ -1,9 +1,30 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * block_sibcms
+ *
+ * @package    block_sibcms
+ * @copyright  2017 Sergey Shlyanin, Aleksandr Raetskiy <ksenon3@mail.ru>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 namespace block_sibcms\output;
 
 use block_sibcms\sibcms_api;
-use core\notification;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -179,7 +200,7 @@ class renderer extends \plugin_renderer_base
 
         $graders = $course_data->graders;
         if (count($graders) > 0) {
-            $result .= $OUTPUT->heading(get_string('key28', 'block_sibcms'), 3);
+            $result .= $OUTPUT->heading(get_string('key28', 'block_sibcms') . ':', 3);
 
             $table = new \html_table();
             $table->attributes['class'] = 'generaltable block_sibcms_gradertable';
@@ -206,14 +227,21 @@ class renderer extends \plugin_renderer_base
             $result .= \html_writer::table($table);
         }
 
+        $feedback = sibcms_api::get_last_course_feedback($course_data->id);
+        if ($feedback && trim($feedback->feedback) != '') {
+            $content = get_string('key29', 'block_sibcms') . '&nbsp;(' . userdate($feedback->timecreated, '%d %b %Y, %H:%M') . ')';
+            $result .= $OUTPUT->heading($content . ':', 3);
+            $result .= \html_writer::div($feedback->feedback);
+        }
+
         if (count($course_data->assigns) > 0) {
-            $result .= $OUTPUT->heading(get_string('key37', 'block_sibcms'), 3);
+            $result .= $OUTPUT->heading(get_string('key37', 'block_sibcms') . ':', 3);
             $assign_table = new activity_assigns_data_table($course_data);
             $result .= $this->render($assign_table);
         }
 
         if (count($course_data->quiz) > 0) {
-            $result .= $OUTPUT->heading(get_string('key36', 'block_sibcms'), 3);
+            $result .= $OUTPUT->heading(get_string('key36', 'block_sibcms') . ':', 3);
             $quiz_table = new activity_quiz_data_table($course_data);
             $result .= $this->render($quiz_table);
         }
