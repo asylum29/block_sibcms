@@ -38,7 +38,8 @@ class form_assigns_data_table implements \renderable
      */
     public function __construct($course_data)
     {
-        //print_object($course_data);
+        global $OUTPUT;
+
         if (count($course_data->assigns) == 0) {
             return '';
         }
@@ -70,7 +71,7 @@ class form_assigns_data_table implements \renderable
         foreach ($course_data->assigns as $assign) {
             $table_row_data = array();
             // Assign name
-            $table_row_data[] = $assign->name;
+            $table_row_data[] = $OUTPUT->pix_icon('icon', '', 'assign', array('class' => 'icon')) . $assign->name;
             // Participant count
             $table_row_data[] = $assign->teamsubmission ? '—' : $assign->participants;
             // Submited files

@@ -124,7 +124,10 @@ if ($mform->is_cancelled()) {
     }
 
     $mform->set_data($params);
+
+    echo \html_writer::start_div('', array('id' => 'block_sibcms'));
     $mform->display();
+    echo \html_writer::end_div();
 
     echo $output->footer();
 }
