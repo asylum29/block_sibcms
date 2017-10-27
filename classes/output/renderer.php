@@ -342,7 +342,7 @@ class renderer extends \plugin_renderer_base
                     if (has_capability('block/sibcms:monitoring', \context_system::instance())) {
                         $params = array('id' => $course->id, 'category' => $course->category, 'returnurl' => $PAGE->url);
                         $course_url = new \moodle_url("$CFG->wwwroot/blocks/sibcms/course.php", $params);
-                        $content = \html_writer::link($course_url, get_string('key19', 'block_sibcms'), array('target' => '_blank'));
+                        $content = \html_writer::link($course_url, get_string('key19', 'block_sibcms'));
                         $content .= '&nbsp;' . $OUTPUT->pix_icon('monitoring', '', 'block_sibcms', array('class' => 'iconsmall'));
                         $notices[] = $content;
                     }

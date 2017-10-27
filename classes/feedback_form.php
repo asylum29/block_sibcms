@@ -34,7 +34,7 @@ class feedback_form extends \moodleform
 
     public function definition()
     {
-        global $PAGE;
+        global $PAGE, $DB, $CFG;
         $mform = $this->_form;
         $course_data = $this->_customdata['course_data'];
         $last_feedback = $this->_customdata['last_feedback'];
@@ -130,6 +130,17 @@ class feedback_form extends \moodleform
             }
         }
 
+        // Course view
+        $mform->addElement('header', 'coursedisplayhrd',
+            get_string('key89', 'block_sibcms'));
+        $course_iframe = \html_writer::tag('iframe', '',
+            array(
+                'src' => new \moodle_url('/course/view.php', array('id' => $course_data->id)),
+                'width' => '100%',
+                'height' => '500px'
+            )
+        );
+        $mform->addElement('static', 'course_display', '', $course_iframe);
 
         $mform->addElement('header', 'feedbackhdr',
             get_string('key87', 'block_sibcms'));

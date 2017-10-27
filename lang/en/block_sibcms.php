@@ -118,3 +118,4 @@ $string['key85'] = 'No more courses require attention in this category';
 $string['key86'] = 'Course modules data';
 $string['key87'] = 'Course grading';
 $string['key88'] = 'Last time graded';
+$string['key89'] = 'Course display';

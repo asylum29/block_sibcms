@@ -129,5 +129,6 @@ if ($mform->is_cancelled()) {
     $mform->display();
     echo \html_writer::end_div();
 
+
     echo $output->footer();
 }
