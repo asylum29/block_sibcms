@@ -34,7 +34,7 @@ class feedback_form extends \moodleform
 
     public function definition()
     {
-        global $PAGE, $DB, $CFG;
+        global $PAGE;
         $mform = $this->_form;
         $course_data = $this->_customdata['course_data'];
         $last_feedback = $this->_customdata['last_feedback'];
