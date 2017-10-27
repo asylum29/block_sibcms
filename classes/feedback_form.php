@@ -18,7 +18,7 @@
  * block_sibcms
  *
  * @package    block_sibcms
- * @copyright  2017 Sergey Shlyanin, Aleksandr Raetskiy <ksenon3@mail.ru>
+ * @copyright  2017 Sergey Shlyanin <sergei.shlyanin@gmail.com>, Aleksandr Raetskiy <ksenon3@mail.ru>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -37,8 +37,10 @@ class feedback_form extends \moodleform
         global $PAGE;
         $mform = $this->_form;
         $course_data = $this->_customdata['course_data'];
+        $last_feedback = $this->_customdata['last_feedback'];
         $renderer = $PAGE->get_renderer('block_sibcms');
 
+        $mform->addElement('header', 'general', get_string('general', 'form'));
         // Course ID
         $mform->addElement('hidden', 'id', null);
         $mform->setType('id', PARAM_INT);
@@ -91,30 +93,46 @@ class feedback_form extends \moodleform
             $hints_str
         );
 
-        // Assigns information
+        // Last feedback time
+        $mform->addElement('static', 'graders',
+            get_string('key88', 'block_sibcms'),
+            ($last_feedback) ?
+                userdate($last_feedback->timecreated) . '&nbsp;(' . format_time(time() - $last_feedback->timecreated) . ')' :
+                    get_string('never')
+        );
+
+
         $assigns = $course_data->assigns;
-        if (count($assigns)) {
-            $assign_table = new form_assigns_data_table($course_data);
-            $assign_table_str = $renderer->render($assign_table);
-            $mform->addElement('static', 'assign_table',
-                get_string('key37', 'block_sibcms'),
-                $assign_table_str
-            );
-        }
-
-        // Quiz information
         $quiz = $course_data->quiz;
-        if (count($quiz)) {
+        if (count($assigns) || count($quiz)) {
+            $mform->addElement('header', 'mosuledate',
+                get_string('key86', 'block_sibcms'));
 
-            $quiz_table = new form_quiz_data_table($course_data);
-            $quiz_table_str = $renderer->render($quiz_table);
-            $mform->addElement('static', 'quiz_table',
-                get_string('key37', 'block_sibcms'),
-                $quiz_table_str
-            );
+            // Assigns information
+            if (count($assigns)) {
+                $assign_table = new form_assigns_data_table($course_data);
+                $assign_table_str = $renderer->render($assign_table);
+                $mform->addElement('static', 'assign_table',
+                    get_string('key37', 'block_sibcms'),
+                    $assign_table_str
+                );
+            }
 
+            // Quiz information
+            if (count($quiz)) {
+
+                $quiz_table = new form_quiz_data_table($course_data);
+                $quiz_table_str = $renderer->render($quiz_table);
+                $mform->addElement('static', 'quiz_table',
+                    get_string('key37', 'block_sibcms'),
+                    $quiz_table_str
+                );
+            }
         }
 
+
+        $mform->addElement('header', 'feedbackhdr',
+            get_string('key87', 'block_sibcms'));
         // Course status
         $results = array();
         $results['none'] = get_string('key31', 'block_sibcms');

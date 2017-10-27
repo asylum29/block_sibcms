@@ -18,7 +18,7 @@
  * block_sibcms
  *
  * @package    block_sibcms
- * @copyright  2017 Sergey Shlyanin, Aleksandr Raetskiy <ksenon3@mail.ru>
+ * @copyright  2017 Sergey Shlyanin <sergei.shlyanin@gmail.com>, Aleksandr Raetskiy <ksenon3@mail.ru>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -115,3 +115,8 @@ $string['key82'] = 'В некоторых заданиях отключены о
 $string['key83'] = 'Категория с id {$a->category} не содержит курс с id {$a->course}';
 $string['key84'] = 'Сохранить и перейти к следующему курсу';
 $string['key85'] = 'В категории больше нет курсов, требующих внимания';
+$string['key86'] = 'Данные о модулях курса';
+$string['key87'] = 'Оценивание курса';
+$string['key86'] = 'Данные о модулях курса';
+$string['key87'] = 'Оценивание курса';
+$string['key88'] = 'Последняя проверка';

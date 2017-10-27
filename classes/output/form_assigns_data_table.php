@@ -18,7 +18,7 @@
  * block_sibcms
  *
  * @package    block_sibcms
- * @copyright  2017 Sergey Shlyanin, Aleksandr Raetskiy <ksenon3@mail.ru>
+ * @copyright  2017 Sergey Shlyanin <sergei.shlyanin@gmail.com>, Aleksandr Raetskiy <ksenon3@mail.ru>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -58,12 +58,12 @@ class form_assigns_data_table implements \renderable
         $this->table_head[] = get_string('key45', 'block_sibcms');
 
         $this->table_size = array(
-            '40%',
+            '30%',
             '10%',
             '10%',
             '10%',
-            '20%',
-            '20%'
+            '15%',
+            '35%'
         );
 
         $this->table_data = array();

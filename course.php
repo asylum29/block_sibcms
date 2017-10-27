@@ -18,7 +18,7 @@
  * block_sibcms
  *
  * @package    block_sibcms
- * @copyright  2017 Sergey Shlyanin, Aleksandr Raetskiy <ksenon3@mail.ru>
+ * @copyright  2017 Sergey Shlyanin <sergei.shlyanin@gmail.com>, Aleksandr Raetskiy <ksenon3@mail.ru>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -73,8 +73,11 @@ $PAGE->set_title(get_string('key22', 'block_sibcms', array('name' => $course->fu
 
 $output = $PAGE->get_renderer('block_sibcms');
 
+$last_feedback = block_sibcms\sibcms_api::get_last_course_feedback($course_id);
+
 $custom_data = array(
-    'course_data' => block_sibcms\sibcms_api::get_course_data($course)
+    'course_data' => block_sibcms\sibcms_api::get_course_data($course),
+    'last_feedback' => $last_feedback
 );
 $mform = new block_sibcms\feedback_form(null, $custom_data);
 
@@ -113,7 +116,7 @@ if ($mform->is_cancelled()) {
         'feedback'  => '',
         'comment'   => ''
     );
-    $last_feedback = block_sibcms\sibcms_api::get_last_course_feedback($course_id);
+
     if ($last_feedback) {
         $params['result']   = $last_feedback->result;
         $params['feedback'] = $last_feedback->feedback;
