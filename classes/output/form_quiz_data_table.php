@@ -38,6 +38,8 @@ class form_quiz_data_table implements \renderable
      */
     public function __construct($course_data)
     {
+        global $OUTPUT;
+
         if (count($course_data->quiz) == 0) {
             return '';
         }
@@ -59,8 +61,8 @@ class form_quiz_data_table implements \renderable
         $this->table_data = array();
         foreach ($course_data->quiz as $quiz) {
             $table_row_data = array();
-            // Quiz name
-            $table_row_data[] = $quiz->name;
+            // Quiz name;
+            $table_row_data[] = $OUTPUT->pix_icon('icon', '', 'quiz', array('class' => 'icon')) . $quiz->name;
             // Participant count
             $table_row_data[] = $quiz->participants;
             // Submitted attempts
