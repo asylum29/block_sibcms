@@ -18,7 +18,7 @@
  * block_sibcms
  *
  * @package    block_sibcms
- * @copyright  2017 Sergey Shlyanin, Aleksandr Raetskiy <ksenon3@mail.ru>
+ * @copyright  2017 Sergey Shlyanin <sergei.shlyanin@gmail.com>, Aleksandr Raetskiy <ksenon3@mail.ru>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -38,7 +38,8 @@ class form_assigns_data_table implements \renderable
      */
     public function __construct($course_data)
     {
-        //print_object($course_data);
+        global $OUTPUT;
+
         if (count($course_data->assigns) == 0) {
             return '';
         }
@@ -58,19 +59,19 @@ class form_assigns_data_table implements \renderable
         $this->table_head[] = get_string('key45', 'block_sibcms');
 
         $this->table_size = array(
-            '40%',
+            '30%',
             '10%',
             '10%',
             '10%',
-            '20%',
-            '20%'
+            '15%',
+            '35%'
         );
 
         $this->table_data = array();
         foreach ($course_data->assigns as $assign) {
             $table_row_data = array();
             // Assign name
-            $table_row_data[] = $assign->name;
+            $table_row_data[] = $OUTPUT->pix_icon('icon', '', 'assign', array('class' => 'icon')) . $assign->name;
             // Participant count
             $table_row_data[] = $assign->teamsubmission ? '—' : $assign->participants;
             // Submited files

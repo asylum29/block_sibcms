@@ -18,7 +18,7 @@
  * block_sibcms
  *
  * @package    block_sibcms
- * @copyright  2017 Sergey Shlyanin, Aleksandr Raetskiy <ksenon3@mail.ru>
+ * @copyright  2017 Sergey Shlyanin <sergei.shlyanin@gmail.com>, Aleksandr Raetskiy <ksenon3@mail.ru>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -38,6 +38,8 @@ class form_quiz_data_table implements \renderable
      */
     public function __construct($course_data)
     {
+        global $OUTPUT;
+
         if (count($course_data->quiz) == 0) {
             return '';
         }
@@ -51,16 +53,16 @@ class form_quiz_data_table implements \renderable
         $this->table_head[] = get_string('key48', 'block_sibcms');
 
         $this->table_size = array(
-            '70%',
-            '15%',
-            '15%'
+            '50%',
+            '25%',
+            '25%'
         );
 
         $this->table_data = array();
         foreach ($course_data->quiz as $quiz) {
             $table_row_data = array();
-            // Quiz name
-            $table_row_data[] = $quiz->name;
+            // Quiz name;
+            $table_row_data[] = $OUTPUT->pix_icon('icon', '', 'quiz', array('class' => 'icon')) . $quiz->name;
             // Participant count
             $table_row_data[] = $quiz->participants;
             // Submitted attempts

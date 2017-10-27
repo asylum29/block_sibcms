@@ -18,7 +18,7 @@
  * block_sibcms
  *
  * @package    block_sibcms
- * @copyright  2017 Sergey Shlyanin, Aleksandr Raetskiy <ksenon3@mail.ru>
+ * @copyright  2017 Sergey Shlyanin <sergei.shlyanin@gmail.com>, Aleksandr Raetskiy <ksenon3@mail.ru>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -115,4 +115,7 @@ $string['key82'] = 'Some assigns have no feedbacks';
 $string['key83'] = 'This category with id {$a->category} does not contains the course with id {$a->course}';
 $string['key84'] = 'Save and go to next course';
 $string['key85'] = 'No more courses require attention in this category';
-
+$string['key86'] = 'Course modules data';
+$string['key87'] = 'Course grading';
+$string['key88'] = 'Last time graded';
+$string['key89'] = 'Course display';
