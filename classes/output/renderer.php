@@ -323,7 +323,7 @@ class renderer extends \plugin_renderer_base
                     if ($feedback) {
                         if (trim($feedback->feedback) != '') {
                             $comment = $feedback->feedback . '<br />';
-                            $comment .= \html_writer::tag('i', get_string('key77', 'block_sibcms') . userdate($feedback->timecreated, '%d %b %Y, %H:%M'));
+                            $comment .= \html_writer::tag('i', get_string('key77', 'block_sibcms') . ':&nbsp;' . userdate($feedback->timecreated, '%d %b %Y, %H:%M'));
                             $notices[] = $comment;
                         }
                         if ($feedback->result == 0) {

@@ -63,9 +63,12 @@ if ($contextcoursecat) {
     $myxls->write_string(0, 9, get_string('key49', 'block_sibcms'));
     $myxls->write_string(0, 10, get_string('key68', 'block_sibcms'));
     $myxls->write_string(0, 11, get_string('key29', 'block_sibcms'));
+
+    $temp = 12;
     if ($monitoring) {
-        $myxls->write_string(0, 12, get_string('key35', 'block_sibcms'));
+        $myxls->write_string(0, $temp++, get_string('key35', 'block_sibcms'));
     }
+    $myxls->write_string(0, $temp, get_string('key77', 'block_sibcms'));
 
     $index = 1;
     $courses = coursecat::get($category_id)->get_courses(array('recursive' => true));
@@ -99,10 +102,12 @@ if ($contextcoursecat) {
 
         $comment = '';
         $feedback = get_string('key76', 'block_sibcms');
+        $datetime = get_string('never');
         $feedback_data = \block_sibcms\sibcms_api::get_last_course_feedback($course_data->id);
         if ($feedback_data) {
             $comment = $feedback_data->comment;
             $feedback = $feedback_data->feedback;
+            $datetime = userdate($feedback_data->timecreated, '%d %b %Y, %H:%M');
         }
         $myxls->write_string($index, 11, $feedback);
 
@@ -110,6 +115,8 @@ if ($contextcoursecat) {
         if ($monitoring) {
             $myxls->write_string($index, $temp++, $comment);
         }
+
+        $myxls->write_string($index, $temp++, $datetime);
 
         $myxls->write_string($index, $temp, "$CFG->wwwroot/course/view.php?id=$course->id");
 
