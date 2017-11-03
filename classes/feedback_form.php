@@ -101,7 +101,6 @@ class feedback_form extends \moodleform
                     get_string('never')
         );
 
-
         $assigns = $course_data->assigns;
         $quiz = $course_data->quiz;
         if (count($assigns) || count($quiz)) {
