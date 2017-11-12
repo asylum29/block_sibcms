@@ -160,43 +160,45 @@ class sibcms_api
         if ($course_data->filescount == 0) {
             $hints[] = get_string('key52', 'block_sibcms');
         }
-        if (count($course_data->assigns) + count($course_data->quiz) == 0) {
-            $hints[] = get_string('key53', 'block_sibcms');
+
+        $need_grading = 0;
+        $assigns_and_quizes = 0;
+        $all_assings_are_grading = true;
+        $all_assings_have_feedbacks = true;
+        foreach ($course_data->assigns as $assign) {
+            if ($assign->modvisible) {
+                if (!$assign->teamsubmission && !$assign->nograde) {
+                    $need_grading += $assign->need_grading;
+                }
+                $assigns_and_quizes++;
+                $all_assings_are_grading &= !$assign->nograde;
+                $all_assings_have_feedbacks &= (count($assign->feedbacks) > 0);
+            }
+        }
+        $all_quiz_have_questions = true;
+        foreach ($course_data->quiz as $quiz) {
+            if ($quiz->modvisible) {
+                $assigns_and_quizes++;
+                $all_quiz_have_questions &= !$quiz->noquestions;
+            }
         }
 
-        $all_assings_are_grading = true;
-        foreach ($course_data->assigns as $assign) {
-            $all_assings_are_grading &= !$assign->nograde;
+        if ($assigns_and_quizes == 0) {
+            $hints[] = get_string('key53', 'block_sibcms');
         }
         if (!$all_assings_are_grading) {
             $hints[] = get_string('key54', 'block_sibcms');
         }
-
-        $all_assings_have_feedbacks = true;
-        foreach ($course_data->assigns as $assign) {
-            $all_assings_have_feedbacks &= (count($assign->feedbacks) > 0);
-        }
         if (!$all_assings_have_feedbacks) {
             $hints[] = get_string('key82', 'block_sibcms');
-        }
-
-        $all_quiz_have_questions = true;
-        foreach ($course_data->quiz as $quiz) {
-            $all_quiz_have_questions &= !$quiz->noquestions;
         }
         if (!$all_quiz_have_questions) {
             $hints[] = get_string('key55', 'block_sibcms');
         }
-
-        $need_grading = 0;
-        foreach ($course_data->assigns as $assign) {
-            if (!$assign->teamsubmission && !$assign->nograde) {
-                $need_grading += $assign->need_grading;
-            }
-        }
         if ($need_grading > 0) {
             $hints[] = get_string('key60', 'block_sibcms', array('count' => $need_grading));
         }
+
         return $hints;
     }
 
@@ -222,7 +224,7 @@ class sibcms_api
      * @param $group
      * @return \stdClass
      */
-    public static function get_course_data($course, $group = 0)
+    public static function get_course_data($course, $group = 0, $onlyvisible = true)
     {
         $modinfo = get_fast_modinfo($course->id);
         $result = new \stdClass();
@@ -232,10 +234,10 @@ class sibcms_api
         $result->graders = sibcms_api::get_course_graders($course->id);
         $result->participants = sibcms_api::get_count_course_participants($course->id);
         $result->filescount = sibcms_api::get_count_course_files($course->id);
-        $assign_data = sibcms_api::get_assign_grades_data($modinfo, $group, true);
+        $assign_data = sibcms_api::get_assign_grades_data($modinfo, $group, $onlyvisible);
         $result->assigns = $assign_data['data'];
         $result->assigns_results = $assign_data['results'];
-        $quiz_data = sibcms_api::get_quiz_grades_data($modinfo, $group, true);
+        $quiz_data = sibcms_api::get_quiz_grades_data($modinfo, $group, $onlyvisible);
         $result->quiz = $quiz_data['data'];
         $result->quiz_results = $quiz_data['results'];
         $all_tasks = $result->assigns_results->participants + $result->quiz_results->participants;
@@ -497,25 +499,32 @@ class sibcms_api
 
     public static function set_modvisible($module, $visible)
     {
-        /*global $DB;
-
-        $count = $DB->count_records('report_activity_visibility', array('moduleid' => $module->id));
+        global $DB;
+        $visible = $visible ? 1 : 0;
+        $count = $DB->count_records('block_sibcms_visibility', array('moduleid' => $module->id));
         if ($count > 0) {
-            $DB->set_field('report_activity_visibility', 'visible', $visible, array('moduleid' => $module->id));
+            $DB->set_field('block_sibcms_visibility', 'visible', $visible, array('moduleid' => $module->id));
         } else {
-            $DB->execute('INSERT INTO {report_activity_visibility} (courseid, moduleid, visible) VALUES (?, ?, ?)', array($module->course, $module->id, $visible));
-        }*/
-        return true;
+            $DB->execute('INSERT INTO {block_sibcms_visibility} (courseid, moduleid, visible) VALUES (?, ?, ?)', 
+                array($module->course, $module->id, $visible));
+        }
     }
 
     public static function get_modvisible($module)
     {
-        /*global $DB;
-
-        $record = $DB->get_record('report_activity_visibility', array('moduleid' => $module->id));
-
-        return !$record ? $module->visible : $record->visible;*/
-        return $module->visible;
+        global $DB;
+        $record = $DB->get_record('block_sibcms_visibility', array('moduleid' => $module->id));
+        return !$record ? $module->visible : $record->visible;
+    }
+    
+    public static function delete_modvisible($module_id) {
+        global $DB;
+        $DB->delete_records('block_sibcms_visibility', array('moduleid' => $module_id));
+    }
+    
+    public static function delete_modvisible_by_course_id($course_id) {
+        global $DB;
+        $DB->delete_records('block_sibcms_visibility', array('courseid' => $course_id));
     }
 
 }

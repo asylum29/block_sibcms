@@ -27,7 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 $capabilities = array(
 
     'block/sibcms:myaddinstance' => array(
-        'captype' => 'write',
+        'captype'      => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
         'archetypes' => array(
             'user' => CAP_ALLOW
@@ -35,18 +35,18 @@ $capabilities = array(
     ),
 
     'block/sibcms:addinstance' => array(
-        'riskbitmask' => RISK_SPAM | RISK_XSS,
-        'captype' => 'write',
+        'riskbitmask'  => RISK_SPAM | RISK_XSS,
+        'captype'      => 'write',
         'contextlevel' => CONTEXT_BLOCK,
-        'archetypes' => array(
+        'archetypes'   => array(
             'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
+            'manager'        => CAP_ALLOW
         )
     ),
 
     'block/sibcms:monitoring' => array(
-        'riskbitmask' => RISK_SPAM | RISK_XSS,
-        'captype' => 'write',
+        'riskbitmask'  => RISK_SPAM | RISK_XSS,
+        'captype'      => 'write',
         'contextlevel' => CONTEXT_SYSTEM
     ),
 
@@ -59,6 +59,11 @@ $capabilities = array(
             'editingteacher' => CAP_ALLOW,
             'manager' 		 => CAP_ALLOW
         )
+    ),
+
+    'block/sibcms:activity_report_toggle' => array(
+        'captype' 	   => 'write',
+        'contextlevel' => CONTEXT_COURSE
     ),
 
     'block/sibcms:monitoring_report' => array(

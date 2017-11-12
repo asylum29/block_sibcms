@@ -31,6 +31,7 @@ class activity_quiz_data_table implements \renderable
     public $table_head;
     public $table_size;
     public $table_data;
+    public $table_classes;
 
     /**
      * Assigns_data_table constructor.
@@ -38,7 +39,7 @@ class activity_quiz_data_table implements \renderable
      */
     public function __construct($course_data)
     {
-        global $OUTPUT, $CFG;
+        global $OUTPUT, $CFG, $PAGE;
 
         $this->table_head = array();
         $this->table_head[] = get_string('key46', 'block_sibcms');
@@ -57,14 +58,32 @@ class activity_quiz_data_table implements \renderable
                 $quizurl = "$CFG->wwwroot/mod/quiz/view.php?id=$id";
                 $content = \html_writer::link($quizurl, $content) . '&nbsp;';
             }
-            if ($quiz->noquestions)
-                $content .= $OUTPUT->pix_icon('noquestions', get_string('key74', 'block_sibcms'), 'block_sibcms', array('class' => 'iconsmall'));
+            $context = \context_course::instance($course_data->id);
+            $toggle = has_capability('block/sibcms:activity_report', $context) &&
+                      has_capability('block/sibcms:activity_report_toggle', $context);
+            if ($toggle) {
+                $showhide = $quiz->modvisible ? 'hide' : 'show';
+                $toggleurl = new \moodle_url('/blocks/sibcms/toggle.php',
+                    array(
+                        $showhide   => $id, 
+                        'sesskey'   => \sesskey(), 
+                        'returnurl' => $PAGE->url . '#block_sibcms_' . $course_data->id
+                    )
+                );
+                $icon = $OUTPUT->pix_icon("t/$showhide", get_string($showhide), '', array('class' => 'iconsmall'));
+                $content .= \html_writer::link($toggleurl, $icon);
+            }
+            if ($quiz->noquestions) {
+                $content .= $OUTPUT->pix_icon('noquestions', get_string('key74', 'block_sibcms'), 'block_sibcms', array('class' => 'iconsmall'));   
+            }
             $table_row_data[] = $content;
 
             $table_row_data[] = $quiz->participants;
             $table_row_data[] = $quiz->submitted;
             $table_row_data[] = $this->percentformat_value($quiz->submitted_persent, false);
             $this->table_data[] = $table_row_data;
+            
+            $this->table_classes[] = !$quiz->modvisible ? 'dimmed_text' : '';
         }
 
         $result_row = array();

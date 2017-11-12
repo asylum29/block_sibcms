@@ -29,6 +29,7 @@ $string['sibcms:monitoring'] = 'Осуществлять мониторинг к
 $string['sibcms:activity_report'] = 'Просматривать отчет о работе в курсе';
 $string['sibcms:monitoring_report'] = 'Просматривать отчет «Мониторинг курсов»';
 $string['sibcms:monitoring_report_category'] = 'Просматривать категорию отчета «Мониторинг курсов»';
+$string['sibcms:activity_report_toggle'] = 'Переключать видимость элементов отчета «Работа в курсе»';
 $string['key1'] = 'Мониторинг курсов';
 $string['key2'] = 'Категория';
 $string['key3'] = 'Количество курсов';

@@ -31,6 +31,7 @@ class activity_assigns_data_table implements \renderable
     public $table_head;
     public $table_size;
     public $table_data;
+    public $table_classes;
 
     /**
      * Assigns_data_table constructor.
@@ -38,7 +39,7 @@ class activity_assigns_data_table implements \renderable
      */
     public function __construct($course_data)
     {
-        global $OUTPUT, $CFG;
+        global $OUTPUT, $CFG, $PAGE;
 
         $this->table_head = array();
         $this->table_head[] = get_string('key38', 'block_sibcms');
@@ -59,10 +60,27 @@ class activity_assigns_data_table implements \renderable
                 $assignurl = "$CFG->wwwroot/mod/assign/view.php?id=$id";
                 $content = \html_writer::link($assignurl, $content) . '&nbsp;';
             }
-            if ($assign->nograde)
+            $context = \context_course::instance($course_data->id);
+            $toggle = has_capability('block/sibcms:activity_report', $context) &&
+                      has_capability('block/sibcms:activity_report_toggle', $context);
+            if ($toggle) {
+                $showhide = $assign->modvisible ? 'hide' : 'show';
+                $toggleurl = new \moodle_url('/blocks/sibcms/toggle.php',
+                    array(
+                        $showhide   => $id,
+                        'sesskey'   => \sesskey(),
+                        'returnurl' => $PAGE->url . '#block_sibcms_' . $course_data->id
+                    )
+                );
+                $icon = $OUTPUT->pix_icon("t/$showhide", get_string($showhide), '', array('class' => 'iconsmall'));
+                $content .= \html_writer::link($toggleurl, $icon);
+            }
+            if ($assign->nograde) {
                 $content .= $OUTPUT->pix_icon('nograde', get_string('key56', 'block_sibcms'), 'block_sibcms', array('class' => 'iconsmall'));
-            if ($assign->teamsubmission)
+            }
+            if ($assign->teamsubmission) {
                 $content .= $OUTPUT->pix_icon('i/users', get_string('key73', 'block_sibcms'), '', array('class' => 'iconsmall'));
+            }
             $table_row_data[] = $content;
 
             $table_row_data[] = $assign->teamsubmission ? '—' : $assign->participants;
@@ -84,6 +102,8 @@ class activity_assigns_data_table implements \renderable
                 $table_row_data[] = '—';
             }
             $this->table_data[] = $table_row_data;
+            
+            $this->table_classes[] = !$assign->modvisible ? 'dimmed_text' : '';
         }
 
         $result_row = array();
