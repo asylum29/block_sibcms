@@ -24,15 +24,23 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$observers = array(
+function xmldb_block_sibcms_upgrade($oldversion) {
+    global $DB;
+    $dbman = $DB->get_manager();
 
-    array(
-        'eventname' => '\core\event\course_deleted',
-        'callback'  => '\block_sibcms\sibcms_observers::course_deleted',
-    ),
-    array(
-        'eventname' => '\core\event\course_module_deleted',
-        'callback'  => '\block_sibcms\sibcms_observers::course_module_deleted'
-    ),
+    if ($oldversion < 2017111219) {
+        $table = new xmldb_table('block_sibcms_visibility');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '11', XMLDB_UNSIGNED, XMLDB_NOTNULL, XMLDB_SEQUENCE);
+        $table->add_field('courseid', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL);
+        $table->add_field('moduleid', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL);
+        $table->add_field('visible', XMLDB_TYPE_INTEGER, '1');
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('foreign1', XMLDB_KEY_FOREIGN, array('courseid'), 'course', array('id'));
+        $table->add_key('foreign2', XMLDB_KEY_FOREIGN_UNIQUE, array('moduleid'), 'course_modules', array('id'));
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+    }
 
-);
+    return true;
+}
