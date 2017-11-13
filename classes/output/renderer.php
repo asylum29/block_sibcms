@@ -176,6 +176,7 @@ class renderer extends \plugin_renderer_base
         $table->head = $widget->table_head;
         $table->size = $widget->table_size;
         $table->data = $widget->table_data;
+        $table->rowclasses = $widget->table_classes;
         $table_str = \html_writer::table($table);
         return $table_str;
     }
@@ -186,6 +187,7 @@ class renderer extends \plugin_renderer_base
         $table->head = $widget->table_head;
         $table->size = $widget->table_size;
         $table->data = $widget->table_data;
+        $table->rowclasses = $widget->table_classes;
         $table_str = \html_writer::table($table);
         return $table_str;
     }
@@ -198,7 +200,7 @@ class renderer extends \plugin_renderer_base
         $course = get_course($course_id);
         $result .= groups_print_course_menu($course, $PAGE->url, true);
         $group = groups_get_course_group($course);
-        $course_data = sibcms_api::get_course_data($course, $group);
+        $course_data = sibcms_api::get_course_data($course, $group, false);
 
         $graders = $course_data->graders;
         if (count($graders) > 0) {
@@ -340,7 +342,7 @@ class renderer extends \plugin_renderer_base
                     $content = get_string('key65', 'block_sibcms', $content);
                     $notices[] = \html_writer::tag('b', $content);
                     if (has_capability('block/sibcms:monitoring', \context_system::instance())) {
-                        $params = array('id' => $course->id, 'category' => $course->category, 'returnurl' => $PAGE->url);
+                        $params = array('id' => $course->id, 'category' => $course->category, 'returnurl' => $PAGE->url . '#block_sibcms_' . $course->id);
                         $course_url = new \moodle_url("$CFG->wwwroot/blocks/sibcms/course.php", $params);
                         $content = \html_writer::link($course_url, get_string('key19', 'block_sibcms'));
                         $content .= '&nbsp;' . $OUTPUT->pix_icon('monitoring', '', 'block_sibcms', array('class' => 'iconsmall'));
@@ -355,6 +357,7 @@ class renderer extends \plugin_renderer_base
 
                     $row = new \html_table_row($cells);
                     $row->attributes['class'] = $class;
+                    $row->id = 'block_sibcms_' . $course_data->id;
                     $table->data[] = $row;
 
                     $content = \html_writer::start_div('block_sibcms_coursestats');

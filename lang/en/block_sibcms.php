@@ -29,6 +29,7 @@ $string['sibcms:monitoring'] = 'Monitor courses';
 $string['sibcms:activity_report'] = 'View course activity report';
 $string['sibcms:monitoring_report'] = 'View the report «Course monitoring» ';
 $string['sibcms:monitoring_report_category'] = 'View the category report «Course monitoring»';
+$string['sibcms:activity_report_toggle'] = 'Toggle report «Course activity» elements visibility';
 $string['key1'] = 'Course monitoring';
 $string['key2'] = 'Category';
 $string['key3'] = 'Course count';
