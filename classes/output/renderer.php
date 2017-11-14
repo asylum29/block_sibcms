@@ -274,11 +274,12 @@ class renderer extends \plugin_renderer_base
         $categories = \coursecat::make_categories_list('block/sibcms:monitoring_report_category');
         if (count($categories) > 0) {
             $params = array('id' => $course_id, 'category' => $category_id);
-            $exporturl = new \moodle_url($CFG->wwwroot . '/blocks/sibcms/export.php', $params);
-            $result .= $OUTPUT->single_button($exporturl, get_string('key64', 'block_sibcms'), 'get');
+            $export_url = new \moodle_url($CFG->wwwroot . '/blocks/sibcms/export.php', $params);
+            $result .= $OUTPUT->single_button($export_url, get_string('key64', 'block_sibcms'), 'get');
 
             $label = $OUTPUT->container(get_string('categories') . ':', 'block_sibcms_coursecat_label');
-            $select = $OUTPUT->single_select($PAGE->url, 'category', $categories, $category_id);
+            $select_url = new \moodle_url($CFG->wwwroot . '/blocks/sibcms/report.php', array('id' => $course_id));
+            $select = $OUTPUT->single_select($select_url, 'category', $categories, $category_id);
             $result .= $OUTPUT->container($label . $select, 'block_sibcms_coursecat_select');
 
             $courses = $category_id > 0 ? \coursecat::get($category_id)->get_courses(array('recursive' => true)) : array();
