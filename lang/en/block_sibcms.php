@@ -120,3 +120,4 @@ $string['key86'] = 'Course modules data';
 $string['key87'] = 'Course grading';
 $string['key88'] = 'Last time graded';
 $string['key89'] = 'Course display';
+$string['key90'] = 'Some teachers have never entered the course';

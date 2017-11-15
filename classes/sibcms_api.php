@@ -154,6 +154,14 @@ class sibcms_api
         if (count($course_data->graders) == 0) {
             $hints[] = get_string('key50', 'block_sibcms');
         }
+
+        foreach ($course_data->graders as $grader) {
+            if (!$grader->lastcourseaccess) {
+                $hints[] = get_string('key90', 'block_sibcms');
+                break;
+            };
+        }
+
         if (count($course_data->graders) == $course_data->participants) {
             $hints[] = get_string('key51', 'block_sibcms');
         }
