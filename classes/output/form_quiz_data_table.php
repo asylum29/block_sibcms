@@ -47,12 +47,14 @@ class form_quiz_data_table implements \renderable
         $this->table_head = array();
         // Test name
         $this->table_head[] = get_string('key46', 'block_sibcms');
+        // Time limit
+        $this->table_head[] = get_string('key94', 'block_sibcms');
         // Participant count
         $this->table_head[] = get_string('key47', 'block_sibcms');
         // Submitted attempts
         $this->table_head[] = get_string('key48', 'block_sibcms');
 
-        $this->table_size = array('50%', '25%', '25%');
+        $this->table_size = array('40%', '20%', '20%', '20%');
 
         $this->table_data = array();
         foreach ($course_data->quiz as $id => $quiz) {
@@ -66,8 +68,14 @@ class form_quiz_data_table implements \renderable
             $icon = $OUTPUT->pix_icon("i/settings", get_string('settings'), '', array('class' => 'iconsmall'));
             $content .= \html_writer::link($settings_url, $icon);
 
+            if (!$quiz->timelimit) {
+                $content .= $OUTPUT->pix_icon("notimelimit", get_string('key96', 'block_sibcms'), 'block_sibcms', array('class' => 'iconsmall'));
+            }
             $table_row_data[] = $content;
 
+
+            // Time limit
+            $table_row_data[] = $quiz->timelimit ? format_time($quiz->timelimit) : '-';
             // Participant count
             $table_row_data[] = $quiz->participants;
             // Submitted attempts

@@ -124,3 +124,6 @@ $string['key90'] = 'Some teachers have never entered the course';
 $string['key91'] = 'Some teachers have not entered the course for a long period of time';
 $string['key92'] = 'Allowed teachers inactivity';
 $string['key93'] = 'The term of allowed teachers inavitity. A teacher is marks as not entered the course for a long period of time';
+$string['key94'] = 'Time limit';
+$string['key95'] = 'Some quiz have no time limit';
+$string['key96'] = 'No time limit';
