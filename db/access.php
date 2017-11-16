@@ -52,17 +52,17 @@ $capabilities = array(
 
     'block/sibcms:activity_report' => array(
         'riskbitmask'  => RISK_PERSONAL,
-        'captype' 	   => 'read',
+        'captype'      => 'read',
         'contextlevel' => CONTEXT_COURSE,
         'archetypes'   => array(
-            'teacher' 		 => CAP_ALLOW,
+            'teacher'        => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
-            'manager' 		 => CAP_ALLOW
+            'manager'        => CAP_ALLOW
         )
     ),
 
     'block/sibcms:activity_report_toggle' => array(
-        'captype' 	   => 'write',
+        'captype'      => 'write',
         'contextlevel' => CONTEXT_COURSE
     ),
 

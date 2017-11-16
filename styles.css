@@ -99,3 +99,7 @@
     font-weight: bold;
     background-color: lightgray;
 }
+
+#block_sibcms .block_sibcms_exportbtn {
+    float: left;
+}
