@@ -161,6 +161,18 @@ class sibcms_api
                 break;
             };
         }
+        $inactive_teachers = false;
+        $inactivity_term = get_config('block_sibcms', 'allowed_teachers_inactivity');
+        foreach ($course_data->graders as $grader) {
+            $time_passed = time() - $grader->lastcourseaccess;
+            if ($time_passed > $inactivity_term) {
+                $inactive_teachers = true;
+                break;
+            }
+        }
+        if ($inactive_teachers) {
+            $hints[] = get_string('key91', 'block_sibcms');
+        }
 
         if (count($course_data->graders) == $course_data->participants) {
             $hints[] = get_string('key51', 'block_sibcms');
@@ -184,10 +196,12 @@ class sibcms_api
             }
         }
         $all_quiz_have_questions = true;
+        $all_quiz_have_time_limit = true;
         foreach ($course_data->quiz as $quiz) {
             if ($quiz->modvisible) {
                 $assigns_and_quizes++;
                 $all_quiz_have_questions &= !$quiz->noquestions;
+                $all_quiz_have_time_limit &= $quiz->timelimit > 0;
             }
         }
 
@@ -202,6 +216,9 @@ class sibcms_api
         }
         if (!$all_quiz_have_questions) {
             $hints[] = get_string('key55', 'block_sibcms');
+        }
+        if (!$all_quiz_have_time_limit) {
+            $hints[] = get_string('key95', 'block_sibcms');
         }
         if ($need_grading > 0) {
             $hints[] = get_string('key60', 'block_sibcms', array('count' => $need_grading));
@@ -433,6 +450,8 @@ class sibcms_api
             $moddata->noquestions = !$quiz->has_questions();
             $moddata->modvisible = $visible;
             $moddata->visible = has_capability('mod/quiz:view', $cm);
+            $moddata->timelimit = $quiz->get_quiz()->timelimit;
+
 
             list($esql, $uparams) = get_enrolled_sql($cm, 'mod/quiz:attempt', $activitygroup, 'u.*', null, null, null, true);
             $info = new \core_availability\info_module($module);

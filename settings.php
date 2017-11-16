@@ -62,4 +62,13 @@ if ($ADMIN->fulltree) {
         3 * 24 * 60 * 60 // 3 days
     ));
 
+    $name = get_string('key92', 'block_sibcms');
+    $description = get_string('key93', 'block_sibcms');
+    $settings->add(new admin_setting_configduration(
+        'block_sibcms/allowed_teachers_inactivity',
+        $name,
+        $description,
+        40 * 24 * 60 * 60 // 40 days
+    ));
+
 }
