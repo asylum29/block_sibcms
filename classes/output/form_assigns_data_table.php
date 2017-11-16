@@ -66,12 +66,16 @@ class form_assigns_data_table implements \renderable
             $table_row_data = array();
             // Assign name
             $content = $OUTPUT->pix_icon('icon', '', 'assign', array('class' => 'icon')) . $assign->name;
-            $assign_url = new \moodle_url('/mod/assign/view.php', array('id' => $id));
-            $content = \html_writer::link($assign_url, $content) . '&nbsp;';
+            if ($assign->visible) {
+                $assign_url = new \moodle_url('/mod/assign/view.php', array('id' => $id));
+                $content = \html_writer::link($assign_url, $content) . '&nbsp;';
 
-            $settings_url = new \moodle_url('/course/modedit.php', array('update' => $id));
-            $icon = $OUTPUT->pix_icon("i/settings", get_string('settings'), '', array('class' => 'iconsmall'));
-            $content .= \html_writer::link($settings_url, $icon);
+                $settings_url = new \moodle_url('/course/modedit.php', array('update' => $id));
+                $icon = $OUTPUT->pix_icon('i/settings', get_string('settings'), '', array('class' => 'iconsmall'));
+                $content .= \html_writer::link($settings_url, $icon);
+            } else {
+                $content .= '&nbsp;';
+            }
 
             if ($assign->nograde) {
                 $content .= $OUTPUT->pix_icon('nograde', get_string('key56', 'block_sibcms'), 'block_sibcms', array('class' => 'iconsmall'));
@@ -99,7 +103,6 @@ class form_assigns_data_table implements \renderable
                 $feedbacks_names[] = $feedback->get_name();
             }
             $table_row_data[] = \html_writer::alist($feedbacks_names);
-
 
             $this->table_classes[] = !$assign->modvisible ? 'dimmed_text' : '';
             // Write data

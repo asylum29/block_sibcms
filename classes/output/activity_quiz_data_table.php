@@ -55,12 +55,14 @@ class activity_quiz_data_table implements \renderable
 
             $content = $OUTPUT->pix_icon('icon', '', 'quiz', array('class' => 'icon')) . $quiz->name;
             if ($quiz->visible) {
-                $quizurl = "$CFG->wwwroot/mod/quiz/view.php?id=$id";
-                $content = \html_writer::link($quizurl, $content) . '&nbsp;';
+                $quiz_url = "$CFG->wwwroot/mod/quiz/view.php?id=$id";
+                $content = \html_writer::link($quiz_url, $content);
             }
+            $content .= '&nbsp;';
             $context = \context_course::instance($course_data->id);
             $toggle = has_capability('block/sibcms:activity_report', $context) &&
-                      has_capability('block/sibcms:activity_report_toggle', $context);
+                      has_capability('block/sibcms:activity_report_toggle', $context) &&
+                      (has_capability('moodle/course:view', $context) || is_enrolled($context));
             if ($toggle) {
                 $showhide = $quiz->modvisible ? 'hide' : 'show';
                 $toggleurl = new \moodle_url('/blocks/sibcms/toggle.php',
@@ -72,6 +74,9 @@ class activity_quiz_data_table implements \renderable
                 );
                 $icon = $OUTPUT->pix_icon("t/$showhide", get_string($showhide), '', array('class' => 'iconsmall'));
                 $content .= \html_writer::link($toggleurl, $icon);
+            }
+            if (!$quiz->timelimit) {
+                $content .= $OUTPUT->pix_icon('notimelimit', get_string('key96', 'block_sibcms'), 'block_sibcms', array('class' => 'iconsmall'));
             }
             if ($quiz->noquestions) {
                 $content .= $OUTPUT->pix_icon('noquestions', get_string('key74', 'block_sibcms'), 'block_sibcms', array('class' => 'iconsmall'));   

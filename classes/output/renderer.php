@@ -167,6 +167,7 @@ class renderer extends \plugin_renderer_base
         $table->head = $widget->table_head;
         $table->size = $widget->table_size;
         $table->data = $widget->table_data;
+        $table->rowclasses = $widget->table_classes;
         $table_str = \html_writer::table($table);
         return $table_str;
     }
@@ -302,7 +303,8 @@ class renderer extends \plugin_renderer_base
                     $course_data = sibcms_api::get_course_data($course);
 
                     $content = $OUTPUT->pix_icon('i/course', null, '', array('class' => 'icon')) . $course_data->fullname;
-                    if (has_capability('moodle/course:view', \context_course::instance($course->id))) {
+                    $context = \context_course::instance($course->id);
+                    if (has_capability('moodle/course:view', $context) || is_enrolled($context)) {
                         $courseurl = "$CFG->wwwroot/course/view.php?id=$course_data->id";
                         $content = \html_writer::link($courseurl, $content);
                     }

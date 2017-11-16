@@ -57,12 +57,14 @@ class activity_assigns_data_table implements \renderable
 
             $content = $OUTPUT->pix_icon('icon', '', 'assign', array('class' => 'icon')) . $assign->name;
             if ($assign->visible) {
-                $assignurl = "$CFG->wwwroot/mod/assign/view.php?id=$id";
-                $content = \html_writer::link($assignurl, $content) . '&nbsp;';
+                $assign_url = "$CFG->wwwroot/mod/assign/view.php?id=$id";
+                $content = \html_writer::link($assign_url, $content);
             }
+            $content .= '&nbsp;';
             $context = \context_course::instance($course_data->id);
             $toggle = has_capability('block/sibcms:activity_report', $context) &&
-                      has_capability('block/sibcms:activity_report_toggle', $context);
+                      has_capability('block/sibcms:activity_report_toggle', $context) &&
+                      (has_capability('moodle/course:view', $context) || is_enrolled($context));
             if ($toggle) {
                 $showhide = $assign->modvisible ? 'hide' : 'show';
                 $toggleurl = new \moodle_url('/blocks/sibcms/toggle.php',
