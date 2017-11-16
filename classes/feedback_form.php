@@ -54,9 +54,14 @@ class feedback_form extends \moodleform
         $mform->setType('returnurl', PARAM_URL);
 
         // Course link
-        $course_url = new \moodle_url('/course/view.php', array('id' => $course_data->id));
-        $course_link = \html_writer::link($course_url, $course_data->fullname, array('target' => '_blank'));
-        $mform->addElement('static', 'course_fullname', get_string('key27', 'block_sibcms'), $course_link);
+        $context = \context_course::instance($course_data->id);
+        $course_access = (has_capability('moodle/course:view', $context) || is_enrolled($context));
+        $course_name = $course_data->fullname;
+        if ($course_access) {
+            $course_url = new \moodle_url('/course/view.php', array('id' => $course_data->id));
+            $course_name = \html_writer::link($course_url, $course_data->fullname, array('target' => '_blank'));
+        }
+        $mform->addElement('static', 'course_fullname', get_string('key27', 'block_sibcms'), $course_name);
 
         // Graders
         $graders = $course_data->graders;
@@ -130,16 +135,17 @@ class feedback_form extends \moodleform
         }
 
         // Course view
-        $mform->addElement('header', 'coursedisplayhrd',
-            get_string('key89', 'block_sibcms'));
-        $course_iframe = \html_writer::tag('iframe', '',
-            array(
-                'src' => new \moodle_url('/course/view.php', array('id' => $course_data->id)),
-                'width' => '100%',
-                'height' => '500px'
-            )
-        );
-        $mform->addElement('static', 'course_display', '', $course_iframe);
+        if ($course_access) {
+            $mform->addElement('header', 'coursedisplayhrd', get_string('key89', 'block_sibcms'));
+            $course_iframe = \html_writer::tag('iframe', '',
+                array(
+                    'src' => new \moodle_url('/course/view.php', array('id' => $course_data->id)),
+                    'width' => '100%',
+                    'height' => '500px'
+                )
+            );
+            $mform->addElement('static', 'course_display', '', $course_iframe);
+        }
 
         $mform->addElement('header', 'feedbackhdr',
             get_string('key87', 'block_sibcms'));

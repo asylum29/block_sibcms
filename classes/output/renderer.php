@@ -167,6 +167,7 @@ class renderer extends \plugin_renderer_base
         $table->head = $widget->table_head;
         $table->size = $widget->table_size;
         $table->data = $widget->table_data;
+        $table->rowclasses = $widget->table_classes;
         $table_str = \html_writer::table($table);
         return $table_str;
     }
@@ -274,9 +275,15 @@ class renderer extends \plugin_renderer_base
 
         $categories = \coursecat::make_categories_list('block/sibcms:monitoring_report_category');
         if (count($categories) > 0) {
+            $result .= \html_writer::start_div('block_sibcms_exportbtn');
             $params = array('id' => $course_id, 'category' => $category_id);
             $export_url = new \moodle_url($CFG->wwwroot . '/blocks/sibcms/export.php', $params);
             $result .= $OUTPUT->single_button($export_url, get_string('key64', 'block_sibcms'), 'get');
+            $result .= \html_writer::end_div();
+
+            $params['mode'] = 1;
+            $export_url = new \moodle_url($CFG->wwwroot . '/blocks/sibcms/export.php', $params);
+            $result .= $OUTPUT->single_button($export_url, get_string('key91', 'block_sibcms'), 'get');
 
             $label = $OUTPUT->container(get_string('categories') . ':', 'block_sibcms_coursecat_label');
             $select_url = new \moodle_url($CFG->wwwroot . '/blocks/sibcms/report.php', array('id' => $course_id));
@@ -302,7 +309,8 @@ class renderer extends \plugin_renderer_base
                     $course_data = sibcms_api::get_course_data($course);
 
                     $content = $OUTPUT->pix_icon('i/course', null, '', array('class' => 'icon')) . $course_data->fullname;
-                    if (has_capability('moodle/course:view', \context_course::instance($course->id))) {
+                    $context = \context_course::instance($course->id);
+                    if (has_capability('moodle/course:view', $context) || is_enrolled($context)) {
                         $courseurl = "$CFG->wwwroot/course/view.php?id=$course_data->id";
                         $content = \html_writer::link($courseurl, $content);
                     }
