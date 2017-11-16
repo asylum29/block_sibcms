@@ -121,3 +121,6 @@ $string['key87'] = 'Course grading';
 $string['key88'] = 'Last time graded';
 $string['key89'] = 'Course display';
 $string['key90'] = 'Some teachers have never entered the course';
+$string['key91'] = 'Some teachers have not entered the course for a long period of time';
+$string['key92'] = 'Allowed teachers inactivity';
+$string['key93'] = 'The term of allowed teachers inavitity. A teacher is marks as not entered the course for a long period of time';
