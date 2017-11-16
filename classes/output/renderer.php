@@ -156,6 +156,7 @@ class renderer extends \plugin_renderer_base
         $table->head = $widget->table_head;
         $table->size = $widget->table_size;
         $table->data = $widget->table_data;
+        $table->rowclasses = $widget->table_classes;
         $table_str = \html_writer::table($table);
         return $table_str;
     }

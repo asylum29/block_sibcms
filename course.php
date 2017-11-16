@@ -75,8 +75,10 @@ $output = $PAGE->get_renderer('block_sibcms');
 
 $last_feedback = block_sibcms\sibcms_api::get_last_course_feedback($course_id);
 
+$group = groups_get_course_group($course);
+$course_data = block_sibcms\sibcms_api::get_course_data($course, $group, false);
 $custom_data = array(
-    'course_data' => block_sibcms\sibcms_api::get_course_data($course),
+    'course_data' => $course_data,
     'last_feedback' => $last_feedback
 );
 $mform = new block_sibcms\feedback_form(null, $custom_data);

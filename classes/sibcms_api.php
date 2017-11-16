@@ -155,16 +155,23 @@ class sibcms_api
             $hints[] = get_string('key50', 'block_sibcms');
         }
 
-        $inactivity_term = get_config('block_sibcms', 'allowed_teachers_inactivity');
         foreach ($course_data->graders as $grader) {
             if (!$grader->lastcourseaccess) {
                 $hints[] = get_string('key90', 'block_sibcms');
                 break;
             };
+        }
+        $inactive_teachers = false;
+        $inactivity_term = get_config('block_sibcms', 'allowed_teachers_inactivity');
+        foreach ($course_data->graders as $grader) {
             $time_passed = time() - $grader->lastcourseaccess;
             if ($time_passed > $inactivity_term) {
-                $hints[] = get_string('key91', 'block_sibcms');
+                $inactive_teachers = true;
+                break;
             }
+        }
+        if ($inactive_teachers) {
+            $hints[] = get_string('key91', 'block_sibcms');
         }
 
         if (count($course_data->graders) == $course_data->participants) {
