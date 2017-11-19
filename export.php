@@ -77,6 +77,10 @@ if ($contextcoursecat) {
         $index = 1;
         foreach ($courses as $course) {
             if (!$course->visible) continue;
+
+            $ignore = \block_sibcms\sibcms_api::get_course_ignore($course->id);
+            if ($ignore) continue;
+
             $course_data = \block_sibcms\sibcms_api::get_course_data($course);
 
             $myxls->write_string($index, 0, $course_data->fullname);
@@ -131,6 +135,10 @@ if ($contextcoursecat) {
         $courses_tree = array();
         foreach ($courses as $course) {
             if (!$course->visible) continue;
+
+            $ignore = \block_sibcms\sibcms_api::get_course_ignore($course->id);
+            if ($ignore) continue;
+
             $course_data = \block_sibcms\sibcms_api::get_course_data($course);
             $course_data->feedback = \block_sibcms\sibcms_api::get_last_course_feedback($course_data->id);
 

@@ -33,9 +33,9 @@ $course->category;
 $return_url  = optional_param('returnurl',
     new moodle_url('/blocks/sibcms/courses.php', array('category' => $course->category)), PARAM_URL);
 
-require_login($id);
+require_login(1);
 
-$context = context_course::instance($id);
+$context = context_system::instance();
 require_capability('block/sibcms:monitoring', $context);
 
 if ($show && confirm_sesskey()) {
