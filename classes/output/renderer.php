@@ -118,10 +118,27 @@ class renderer extends \plugin_renderer_base
                         $status = \html_writer::span(get_string('key26', 'block_sibcms'), 'red');
                     }
                 }
+
+                $coursename = $course->fullname;
+                $context = \context_course::instance($course->id);
+                $toggle = has_capability('block/sibcms:monitoring', $context);
+                if ($toggle) {
+                    $showhide = sibcms_api::get_course_ignore($course->id) ? 'show' : 'hide';
+                    $toggleurl = new \moodle_url('/blocks/sibcms/toggleignore.php',
+                        array(
+                            $showhide   => $course->id,
+                            'sesskey'   => \sesskey(),
+                            'returnurl' => $PAGE->url
+                        )
+                    );
+                    $icon = $OUTPUT->pix_icon("t/$showhide", get_string($showhide), '', array('class' => 'iconsmall'));
+                    $coursename .= '&nbsp;' . \html_writer::link($toggleurl, $icon);
+                }
+
                 $table->data[] = array(
-                    \block_sibcms\sibcms_api::require_attention($course->id) ?
+                    \block_sibcms\sibcms_api::require_attention($course) ?
                         \html_writer::span('!', 'bold red text-center') : '',
-                    $course->fullname,
+                    $coursename,
                     $time_ago,
                     $status,
                     \html_writer::tag('a', get_string('key19', 'block_sibcms'),
@@ -134,11 +151,14 @@ class renderer extends \plugin_renderer_base
                         )
                     )
                 );
+                $row_class = '';
                 if ($widget->last_feedback == $course->id) {
-                    $table->rowclasses[] = 'block_sibcms_lastfeedback';
-                } else {
-                    $table->rowclasses[] = '';
+                    $row_class = 'block_sibcms_lastfeedback ';
                 }
+                if (\block_sibcms\sibcms_api::get_course_ignore($course->id) || !$course->visible) {
+                    $row_class .= 'dimmed_text';
+                }
+                $table->rowclasses[] = $row_class;
             }
             $result .= \html_writer::table($table);
             $result .= $OUTPUT->paging_bar($widget->courses_count, $widget->page, 20,
@@ -302,8 +322,12 @@ class renderer extends \plugin_renderer_base
                 );
                 $table->size = array('40%', '30%', '30%', '25px');
 
+                $monitoring = has_capability('block/sibcms:monitoring', \context_system::instance());
                 foreach ($courses as $course) {
                     if (!$course->visible) continue;
+
+                    $ignore = sibcms_api::get_course_ignore($course->id);
+                    if (!$monitoring && $ignore) continue;
 
                     $cells = array();
                     $course_data = sibcms_api::get_course_data($course);
@@ -313,6 +337,18 @@ class renderer extends \plugin_renderer_base
                     if (has_capability('moodle/course:view', $context) || is_enrolled($context)) {
                         $courseurl = "$CFG->wwwroot/course/view.php?id=$course_data->id";
                         $content = \html_writer::link($courseurl, $content);
+                    }
+                    if ($monitoring) {
+                        $showhide = $ignore ? 'show' : 'hide';
+                        $toggleurl = new \moodle_url('/blocks/sibcms/toggleignore.php',
+                            array(
+                                $showhide   => $course->id,
+                                'sesskey'   => \sesskey(),
+                                'returnurl' => $PAGE->url
+                            )
+                        );
+                        $icon = $OUTPUT->pix_icon("t/$showhide", get_string($showhide), '', array('class' => 'iconsmall'));
+                        $content .= '&nbsp;' . \html_writer::link($toggleurl, $icon);
                     }
                     $content = $OUTPUT->heading($content, 4, 'block_sibcms_coursename');
                     $cells[] = new \html_table_cell($content);
@@ -351,7 +387,7 @@ class renderer extends \plugin_renderer_base
                     $content = format_float($course_data->result * 100, 2, true, true) . '%';
                     $content = get_string('key65', 'block_sibcms', $content);
                     $notices[] = \html_writer::tag('b', $content);
-                    if (has_capability('block/sibcms:monitoring', \context_system::instance())) {
+                    if ($monitoring) {
                         $params = array('id' => $course->id, 'category' => $course->category, 'returnurl' => $PAGE->url . '#block_sibcms_' . $course->id);
                         $course_url = new \moodle_url("$CFG->wwwroot/blocks/sibcms/course.php", $params);
                         $content = \html_writer::link($course_url, get_string('key19', 'block_sibcms'));
@@ -366,6 +402,9 @@ class renderer extends \plugin_renderer_base
                     $cells[] = new \html_table_cell($content);
 
                     $row = new \html_table_row($cells);
+                    if ($ignore) {
+                        $class .= ' dimmed_text';
+                    }
                     $row->attributes['class'] = $class;
                     $row->id = 'block_sibcms_' . $course_data->id;
                     $table->data[] = $row;

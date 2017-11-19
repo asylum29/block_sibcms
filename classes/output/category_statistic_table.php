@@ -45,7 +45,7 @@ class category_statistic_table implements \renderable
             $cat->courses_total = count($courses);
             $cat->courses_require_attention = 0;
             foreach ($courses as $course) {
-                if (\block_sibcms\sibcms_api::require_attention($course->id)) {
+                if (\block_sibcms\sibcms_api::require_attention($course)) {
                     $cat->courses_require_attention++;
                 }
             }
