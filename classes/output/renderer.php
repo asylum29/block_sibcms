@@ -118,10 +118,27 @@ class renderer extends \plugin_renderer_base
                         $status = \html_writer::span(get_string('key26', 'block_sibcms'), 'red');
                     }
                 }
+
+                $coursename = $course->fullname;
+                $context = \context_course::instance($course->id);
+                $toggle = has_capability('block/sibcms:monitoring', $context);
+                if ($toggle) {
+                    $showhide = sibcms_api::get_course_ignore($course->id)? 'show' : 'hide';
+                    $toggleurl = new \moodle_url('/blocks/sibcms/toggleignore.php',
+                        array(
+                            $showhide   => $course->id,
+                            'sesskey'   => \sesskey(),
+                            'returnurl' => $PAGE->url
+                        )
+                    );
+                    $icon = $OUTPUT->pix_icon("t/$showhide", get_string($showhide), '', array('class' => 'iconsmall'));
+                    $coursename .= \html_writer::link($toggleurl, $icon);
+                }
+
                 $table->data[] = array(
-                    \block_sibcms\sibcms_api::require_attention($course->id) ?
+                    \block_sibcms\sibcms_api::require_attention($course) ?
                         \html_writer::span('!', 'bold red text-center') : '',
-                    $course->fullname,
+                    $coursename,
                     $time_ago,
                     $status,
                     \html_writer::tag('a', get_string('key19', 'block_sibcms'),
@@ -134,11 +151,14 @@ class renderer extends \plugin_renderer_base
                         )
                     )
                 );
+                $row_class = '';
                 if ($widget->last_feedback == $course->id) {
-                    $table->rowclasses[] = 'block_sibcms_lastfeedback';
-                } else {
-                    $table->rowclasses[] = '';
+                    $row_class = 'block_sibcms_lastfeedback ';
                 }
+                if (\block_sibcms\sibcms_api::get_course_ignore($course->id) || !$course->visible) {
+                    $row_class .= 'dimmed_text';
+                }
+                $table->rowclasses[] = $row_class;
             }
             $result .= \html_writer::table($table);
             $result .= $OUTPUT->paging_bar($widget->courses_count, $widget->page, 20,

@@ -91,9 +91,20 @@ class sibcms_api
      * @param $course_id
      * @return bool
      */
-    public static function require_attention($course_id)
+    public static function require_attention($course)
     {
-        $last_feedback = sibcms_api::get_last_course_feedback($course_id);
+        // Course is not visible
+        if (!$course->visible) {
+            return false;
+        }
+
+        // Course is ignored
+        $ignore = sibcms_api::get_course_ignore($course->id);
+        if ($ignore) {
+            return false;
+        }
+
+        $last_feedback = sibcms_api::get_last_course_feedback($course->id);
         // Course has no feedback
         if (!$last_feedback) {
             return true;
@@ -136,7 +147,7 @@ class sibcms_api
             return null;
         $courses = $category->get_courses(array('recursive' => true));
         foreach ($courses as $course) {
-            if (sibcms_api::require_attention($course->id)) {
+            if (sibcms_api::require_attention($course)) {
                 return $course->id;
             }
         }
@@ -244,6 +255,8 @@ class sibcms_api
         $result->id = $course->id;
         $result->fullname = $course->fullname;
         $result->shortname = $course->shortname;
+        $result->visible = $course->visible;
+        $result->ignore = sibcms_api::get_course_ignore($course->id);
         $result->graders = sibcms_api::get_course_graders($course->id);
         $result->participants = sibcms_api::get_count_course_participants($course->id);
         $result->filescount = sibcms_api::get_count_course_files($course->id);
@@ -540,6 +553,31 @@ class sibcms_api
     public static function delete_modvisible_by_course_id($course_id) {
         global $DB;
         $DB->delete_records('block_sibcms_visibility', array('courseid' => $course_id));
+    }
+
+    public static function set_course_ignore($course_id, $ignore)
+    {
+        global $DB;
+        $ignore = $ignore ? 1 : 0;
+        $count = $DB->count_records('block_sibcms_ignore_courses', array('courseid' => $course_id));
+        if ($count > 0) {
+            $DB->set_field('block_sibcms_ignore_courses', 'ignoring', $ignore, array('courseid' => $course_id));
+        } else {
+            $DB->execute('INSERT INTO {block_sibcms_ignore_courses} (courseid, ignoring) VALUES (?, ?)',
+                array($course_id, $ignore));
+        }
+    }
+
+    public static function get_course_ignore($course_id)
+    {
+        global $DB;
+        $record = $DB->get_record('block_sibcms_ignore_courses', array('courseid' => $course_id));
+        return !$record ? false : $record->ignoring;
+    }
+
+    public static function delete_course_ignore($course_id) {
+        global $DB;
+        $DB->delete_records('block_sibcms_ignore_courses', array('courseid' => $course_id));
     }
 
 }

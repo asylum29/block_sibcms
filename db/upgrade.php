@@ -42,5 +42,17 @@ function xmldb_block_sibcms_upgrade($oldversion) {
         }
     }
 
+    if ($oldversion < 2017111915) {
+        $table = new xmldb_table('block_sibcms_ignore_courses');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '11', XMLDB_UNSIGNED, XMLDB_NOTNULL, XMLDB_SEQUENCE);
+        $table->add_field('courseid', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL);
+        $table->add_field('ignoring', XMLDB_TYPE_INTEGER, '1');
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('courseid', XMLDB_KEY_FOREIGN, array('courseid'), 'course', array('id'));
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+    }
+
     return true;
 }

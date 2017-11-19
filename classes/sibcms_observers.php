@@ -31,6 +31,7 @@ class sibcms_observers {
     public static function course_deleted($event) {
         sibcms_api::delete_feedbacks($event->objectid);
         sibcms_api::delete_modvisible_by_course_id($event->objectid);
+        sibcms_api::delete_course_ignore($event->objectid);
     }
 
     public static function course_module_deleted($event) {

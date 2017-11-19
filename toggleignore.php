@@ -22,10 +22,30 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+require_once('../../config.php');
 
-$plugin->version = 2017111915;
-$plugin->maturity  = MATURITY_STABLE;
-$plugin->requires  = 2016052301;
-$plugin->component = 'block_sibcms';
-$plugin->release = 'v1.0';
+$show = optional_param('show', 0, PARAM_INT);
+$hide = optional_param('hide', 0, PARAM_INT);
+$id = $show ? $show : $hide;
+
+$course = get_course($id);
+$course->category;
+$return_url  = optional_param('returnurl',
+    new moodle_url('/blocks/sibcms/courses.php', array('category' => $course->category)), PARAM_URL);
+
+require_login($id);
+
+$context = context_course::instance($id);
+require_capability('block/sibcms:monitoring', $context);
+
+if ($show && confirm_sesskey()) {
+    if (\block_sibcms\sibcms_api::get_course_ignore($id)) {
+        \block_sibcms\sibcms_api::set_course_ignore($id, 0);
+    }
+} else if ($hide && confirm_sesskey()) {
+    if (!\block_sibcms\sibcms_api::get_course_ignore($id)) {
+        \block_sibcms\sibcms_api::set_course_ignore($id, 1);
+    }
+}
+
+redirect($return_url);
