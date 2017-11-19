@@ -496,7 +496,6 @@ class sibcms_api
         return count_enrolled_users($context);
     }
 
-
     /**
      * Get course files count
      * @param $courseid
