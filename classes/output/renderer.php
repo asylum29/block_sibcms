@@ -344,7 +344,7 @@ class renderer extends \plugin_renderer_base
                             array(
                                 $showhide   => $course->id,
                                 'sesskey'   => \sesskey(),
-                                'returnurl' => $PAGE->url
+                                'returnurl' => $PAGE->url . '#block_sibcms_' . $course->id
                             )
                         );
                         $icon = $OUTPUT->pix_icon("t/$showhide", get_string($showhide), '', array('class' => 'iconsmall'));
