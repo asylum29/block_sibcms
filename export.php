@@ -75,12 +75,15 @@ if ($contextcoursecat) {
         $myxls->write_string(0, $temp, get_string('key77', 'block_sibcms'));
 
         $index = 1;
+        $course_empty = $course_count = 0;
+        $students_active = $graders_active = 0;
         foreach ($courses as $course) {
             if (!$course->visible) continue;
 
             $ignore = \block_sibcms\sibcms_api::get_course_ignore($course->id);
             if ($ignore) continue;
 
+            $course_count++;
             $course_data = \block_sibcms\sibcms_api::get_course_data($course);
 
             $myxls->write_string($index, 0, $course_data->fullname);
@@ -107,14 +110,26 @@ if ($contextcoursecat) {
 
             $myxls->write_number($index, 10, $course_data->result);
 
+            if ($course_data->assigns_results->submitted > 0 || $course_data->quiz_results->submitted > 0) {
+                $students_active++;
+            }
+
+            if ($course_data->assigns_results->graded > 0 ||
+               ($course_data->assigns_results->participants == 0 && $course_data->quiz_results->submitted > 0)) {
+                $graders_active++;
+            }
+
             $comment = '';
-            $feedback = get_string('key76', 'block_sibcms');
+            $feedback = '';
             $datetime = get_string('never');
             $feedback_data = \block_sibcms\sibcms_api::get_last_course_feedback($course_data->id);
             if ($feedback_data) {
                 $comment = $feedback_data->comment;
                 $feedback = $feedback_data->feedback;
                 $datetime = userdate($feedback_data->timecreated, '%d %b %Y, %H:%M');
+                if ($feedback_data->result == 3) {
+                    $course_empty++;
+                }
             }
             $myxls->write_string($index, 11, $feedback);
 
@@ -129,6 +144,18 @@ if ($contextcoursecat) {
 
             $index++;
         }
+
+        $myxls->write_string(++$index, 0, get_string('key3', 'block_sibcms'));
+        $myxls->write_number($index++, 1, $course_count);
+
+        $myxls->write_string($index, 0, get_string('key97', 'block_sibcms'));
+        $myxls->write_number($index++, 1, $course_empty);
+
+        $myxls->write_string($index, 0, get_string('key98', 'block_sibcms'));
+        $myxls->write_number($index++, 1, $students_active);
+
+        $myxls->write_string($index, 0, get_string('key99', 'block_sibcms'));
+        $myxls->write_number($index++, 1, $graders_active);
 
     } else {
 
@@ -179,6 +206,7 @@ if ($contextcoursecat) {
             }
             $myxls->write_string($index++, $temp, get_string('key77', 'block_sibcms'));
 
+            $result = 0;
             foreach ($data['courses'] as $course) {
                 $myxls->write_string($index, 0, $course->fullname);
 
@@ -201,9 +229,10 @@ if ($contextcoursecat) {
                 $myxls->write_number($index, 9, $course->quiz_results->submitted_persent);
 
                 $myxls->write_number($index, 10, $course->result);
+                $result += $course->result;
 
                 $comment = '';
-                $feedback = get_string('key76', 'block_sibcms');
+                $feedback = '';
                 $datetime = get_string('never');
                 $feedback_data = $course->feedback;
                 if ($feedback_data) {
@@ -223,7 +252,11 @@ if ($contextcoursecat) {
                 $myxls->write_string($index++, $temp, "$CFG->wwwroot/course/view.php?id=$course->id");
             }
 
-            $index++;
+            $count = count($data['courses']); // > 0
+            $myxls->write_string($index, 9, get_string('key63', 'block_sibcms'));
+            $myxls->write_number($index, 10, $result / $count);
+
+            $index += 2;
         }
 
     }

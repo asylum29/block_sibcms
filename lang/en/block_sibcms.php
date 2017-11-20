@@ -125,3 +125,6 @@ $string['key91'] = 'Feedback report by teachers';
 $string['key94'] = 'Time limit';
 $string['key95'] = 'Some quiz have no time limit';
 $string['key96'] = 'No time limit';
+$string['key97'] = 'Empty courses';
+$string['key98'] = 'Courses with student\'s activity';
+$string['key99'] = 'Courses with teacher\'s activity';
