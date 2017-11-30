@@ -54,7 +54,7 @@ class sibcms_api
         $last_feedback = $DB->get_records('block_sibcms_feedbacks', array('courseid' => $course_id), 'timecreated DESC', '*', 0, 1);
         if (count($last_feedback) > 0) {
             $last_feedback = reset($last_feedback);
-            $last_feedback->properties = sibcms_api::get_feedback_properties($last_feedback->id);
+            $last_feedback->properties = sibcms_api::get_feedback_properties($last_feedback->id, $only_active_properties);
             return $last_feedback;
         } else {
             return false;
