@@ -93,7 +93,6 @@ class renderer extends \plugin_renderer_base
                 '',
                 get_string('key10', 'block_sibcms'),
                 get_string('key11', 'block_sibcms'),
-                get_string('key12', 'block_sibcms'),
                 get_string('key13', 'block_sibcms')
             );
             $table->align[0] = 'center';
@@ -102,21 +101,6 @@ class renderer extends \plugin_renderer_base
                 $time_ago = get_string('never');
                 if (!empty($feedback)) {
                     $time_ago = format_time(time() - $feedback->timecreated);
-                }
-                $status = \html_writer::span(get_string('key75', 'block_sibcms'), 'red');
-                if ($feedback) {
-                    if ($feedback->result == 0) {
-                        $status = \html_writer::span(get_string('key23', 'block_sibcms'), 'green');
-                    }
-                    if ($feedback->result == 1) {
-                        $status = \html_writer::span(get_string('key24', 'block_sibcms'));
-                    }
-                    if ($feedback->result == 2) {
-                        $status = \html_writer::span(get_string('key25', 'block_sibcms'));
-                    }
-                    if ($feedback->result == 3) {
-                        $status = \html_writer::span(get_string('key26', 'block_sibcms'), 'red');
-                    }
                 }
 
                 $coursename = $course->fullname;
@@ -140,7 +124,6 @@ class renderer extends \plugin_renderer_base
                         \html_writer::span('!', 'bold red text-center') : '',
                     $coursename,
                     $time_ago,
-                    $status,
                     \html_writer::tag('a', get_string('key19', 'block_sibcms'),
                         array(
                             'href' => new \moodle_url('/blocks/sibcms/course.php', array(
@@ -212,6 +195,30 @@ class renderer extends \plugin_renderer_base
         $table->rowclasses = $widget->table_classes;
         $table_str = \html_writer::table($table);
         return $table_str;
+    }
+
+    public function render_properties_table(properties_table $widget) {
+        $table = new \html_table();
+        $table->attributes['class'] = 'generaltable';
+        $table->head = $widget->table_head;
+        $table->size = $widget->table_size;
+        $table->data = $widget->table_data;
+        $table->rowclasses = $widget->table_classes;
+        $table_str = \html_writer::table($table);
+        return $table_str;
+    }
+
+    public function display_property_create_form() {
+        $result = \html_writer::start_tag('form');
+        $result .= \html_writer::tag('h4', get_string('key104', 'block_sibcms'));
+        $result .= \html_writer::tag('input', '',
+            array('type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()));
+        $result .= \html_writer::tag('input', '',
+            array('type' => 'text', 'name' => 'name'));
+        $result .= \html_writer::tag('input', '',
+            array('type' => 'submit', 'name' => 'create'));
+        $result .= \html_writer::end_tag('form');
+        return $result;
     }
 
     public function display_activity_report($course_id) {

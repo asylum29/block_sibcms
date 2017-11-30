@@ -48,12 +48,49 @@ class sibcms_api
      * @param $course_id
      * @return mixed
      */
-    public static function get_last_course_feedback($course_id)
+    public static function get_last_course_feedback($course_id, $only_active_properties = true)
     {
         global $DB;
         $last_feedback = $DB->get_records('block_sibcms_feedbacks', array('courseid' => $course_id), 'timecreated DESC', '*', 0, 1);
-        return count($last_feedback) > 0 ? reset($last_feedback) : false;
+        if (count($last_feedback) > 0) {
+            $last_feedback = reset($last_feedback);
+            $last_feedback->properties = sibcms_api::get_feedback_properties($last_feedback->id);
+            return $last_feedback;
+        } else {
+            return false;
+        }
     }
+
+    public static function get_feedback_properties($feedback_id, $only_active = true)
+    {
+        global $DB;
+        $args = array($feedback_id);
+        $sql = 'SELECT p.id, p.name
+                  FROM {block_sibcms_feedback_props} fp
+                  JOIN {block_sibcms_properties} p
+                    ON fp.propertyid = p.id
+                 WHERE fp.feedbackid = ? ';
+        if ($only_active) {
+            $sql .= ' AND p.hidden = 0';
+        }
+        return $DB->get_records_sql($sql, $args);
+    }
+
+    /**
+     * Get all properties
+     * @param bool $only_active
+     * @return array
+     */
+    public static function get_properties($only_active = true)
+    {
+        global $DB;
+        $args = array();
+        if ($only_active) {
+            $args['hidden'] = 0;
+        }
+        return $DB->get_records('block_sibcms_properties', $args);
+    }
+
 
     /**
      * Save feedback for the course
@@ -63,27 +100,63 @@ class sibcms_api
      * @param $result
      * @return bool|int
      */
-    public static function save_feedback($course_id, $feedback, $comment, $result)
+    public static function save_feedback($course_id, $feedback, $comment, $result, $properties)
     {
         global $DB, $USER;
         $record = new \stdClass();
         $record->userid = $USER->id;
         $record->courseid = $course_id;
         $record->timecreated = time();
-        $record->result = $result;
         $record->feedback = $feedback;
         $record->comment = $comment;
-        return $DB->insert_record('block_sibcms_feedbacks', $record);
+        $record->result = $result;
+        $last_id = $DB->insert_record('block_sibcms_feedbacks', $record);
+        foreach ($properties as $property_id => $value) {
+            if ($value) {
+                $record = new \stdClass();
+                $record->feedbackid = $last_id;
+                $record->propertyid = $property_id;
+                $DB->insert_record('block_sibcms_feedback_props', $record);
+            }
+        }
     }
 
     /**
-     * Delete all feedbacks for course
+     * Delete all feedbacks for the course
      * @param $course_id
      */
     public static function delete_feedbacks($course_id)
     {
         global $DB;
+        $feedbacks = $DB->get_records('block_sibcms_feedbacks', array('courseid' => $course_id));
+        foreach ($feedbacks as $feedback) {
+            $DB->delete_records('block_sibcms_feedback_props', array('feedbackid' => $feedback->id));
+        }
         $DB->delete_records('block_sibcms_feedbacks', array('courseid' => $course_id));
+    }
+
+    /**
+     * Delte property
+     * @param $property_id
+     */
+    public static function delete_property($property_id)
+    {
+        global $DB;
+        $DB->delete_records('block_sibcms_feedback_props', array('propertyid' => $property_id));
+        $DB->delete_records('block_sibcms_properties', array('id' => $property_id));
+    }
+
+    /**
+     * Add new property
+     * @param $name
+     */
+    public static function add_property($name)
+    {
+        global $DB;
+        $record = new \stdClass();
+        $record->name = $name;
+        $record->hidden = 0;
+        $DB->insert_record('block_sibcms_properties', $record);
     }
 
     /**
@@ -111,27 +184,10 @@ class sibcms_api
         }
         
         $time_ago = time() - $last_feedback->timecreated;
+        if ($time_ago > get_config('block_sibcms', 'feedback_relevance_duration')) {
+            return true;
+        }
 
-        // Course has no errors - 15 day
-        if ($last_feedback->result == 0 &&
-            $time_ago > get_config('block_sibcms', 'no_errors_relevance_duration')) {
-            return true;
-        }
-        // Course has not critical errors
-        if ($last_feedback->result == 1 &&
-            $time_ago > get_config('block_sibcms', 'not_critical_errors_relevance_duration')) {
-            return true;
-        }
-        // Course has critical errors
-        if ($last_feedback->result == 2 &&
-            $time_ago > get_config('block_sibcms', 'critical_errors_relevance_duration')) {
-            return true;
-        }
-        // Course is empty
-        if ($last_feedback->result == 3 &&
-            $time_ago > get_config('block_sibcms', 'empty_course_relevance_duration')) {
-            return true;
-        }
         return false;
     }
 
@@ -143,8 +199,9 @@ class sibcms_api
     public static function get_require_attention_course($category_id)
     {
         $category = \coursecat::get($category_id);
-        if (!$category)
+        if (!$category) {
             return null;
+        }
         $courses = $category->get_courses(array('recursive' => true));
         foreach ($courses as $course) {
             if (sibcms_api::require_attention($course)) {
