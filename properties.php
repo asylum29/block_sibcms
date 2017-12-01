@@ -23,10 +23,12 @@
  */
 
 require_once('../../config.php');
-require_once('../../lib/coursecatlib.php');
-require_once("$CFG->libdir/formslib.php");
 
 $PAGE->set_url(new moodle_url('/blocks/sibcms/properties.php'));
+
+require_login(1);
+
+require_capability('block/sibcms:monitoring', context_system::instance());
 
 $PAGE->set_heading(get_string('key105', 'block_sibcms'));
 $PAGE->navbar->ignore_active();
@@ -34,7 +36,6 @@ $PAGE->navbar->add(get_string('key21', 'block_sibcms'), new moodle_url('/blocks/
 
 $PAGE->navbar->add(get_string('key105', 'block_sibcms'), new moodle_url('/blocks/sibcms/properties.php'));
 
-require_login(1);
 
 $show = optional_param('show', 0, PARAM_INT);
 $hide = optional_param('hide', 0, PARAM_INT);
@@ -46,7 +47,6 @@ $name = optional_param('name', null, PARAM_TEXT);
 $return_url  = optional_param('returnurl',
     new moodle_url('/blocks/sibcms/properties.php'), PARAM_URL);
 
-require_capability('block/sibcms:monitoring', context_system::instance());
 
 $properties = \block_sibcms\sibcms_api::get_properties(false);
 

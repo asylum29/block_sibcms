@@ -39,7 +39,7 @@ class properties_table implements \renderable
      * Quiz_data_table constructor.
      * @param $course_data
      */
-    public function __construct($course_data)
+    public function __construct()
     {
         global $OUTPUT, $PAGE;
 

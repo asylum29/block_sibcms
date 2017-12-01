@@ -111,8 +111,15 @@ class sibcms_api
         $record->comment = $comment;
         $record->result = $result;
         $last_id = $DB->insert_record('block_sibcms_feedbacks', $record);
+
+        $all_properties = \block_sibcms\sibcms_api::get_properties(false);
+
         foreach ($properties as $property_id => $value) {
             if ($value) {
+                if (!array_key_exists($property_id, $all_properties)) {
+                    print_error('invalidargument');
+                }
+
                 $record = new \stdClass();
                 $record->feedbackid = $last_id;
                 $record->propertyid = $property_id;
