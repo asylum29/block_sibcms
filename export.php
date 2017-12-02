@@ -72,10 +72,17 @@ if ($contextcoursecat) {
         if ($monitoring) {
             $myxls->write_string(0, $temp++, get_string('key35', 'block_sibcms'));
         }
-        $myxls->write_string(0, $temp, get_string('key77', 'block_sibcms'));
+        $myxls->write_string(0, $temp++, get_string('key77', 'block_sibcms'));
+
+        $myxls->write_string(0, $temp++, get_string('key23', 'block_sibcms'));
+        $properties = \block_sibcms\sibcms_api::get_properties();
+        foreach ($properties as $property) {
+            $property->total = 0;
+            $myxls->write_string(0, $temp++, $property->name);
+        }
 
         $index = 1;
-        $course_empty = $course_count = 0;
+        $course_ready = $course_count = 0;
         $students_active = $graders_active = 0;
         foreach ($courses as $course) {
             if (!$course->visible) continue;
@@ -127,9 +134,6 @@ if ($contextcoursecat) {
                 $comment = $feedback_data->comment;
                 $feedback = $feedback_data->feedback;
                 $datetime = userdate($feedback_data->timecreated, '%d %b %Y, %H:%M');
-                if ($feedback_data->result == 3) {
-                    $course_empty++;
-                }
             }
             $myxls->write_string($index, 11, $feedback);
 
@@ -140,6 +144,23 @@ if ($contextcoursecat) {
 
             $myxls->write_string($index, $temp++, $datetime);
 
+            if ($feedback_data) {
+                if ($feedback_data->result == 0) {
+                    $myxls->write_string($index, $temp, '+');
+                    $course_ready++;
+                }
+                $temp++;
+                foreach ($properties as $property) {
+                    if (array_key_exists($property->id, $feedback_data->properties)) {
+                        $properties[$property->id]->total++;
+                        $myxls->write_string($index, $temp, '+');
+                    }
+                    $temp++;
+                }
+            } else {
+                $temp += (count($properties) + 1);
+            }
+
             $myxls->write_string($index, $temp, "$CFG->wwwroot/course/view.php?id=$course->id");
 
             $index++;
@@ -149,13 +170,18 @@ if ($contextcoursecat) {
         $myxls->write_number($index++, 1, $course_count);
 
         $myxls->write_string($index, 0, get_string('key97', 'block_sibcms'));
-        $myxls->write_number($index++, 1, $course_empty);
+        $myxls->write_number($index++, 1, $course_ready);
 
         $myxls->write_string($index, 0, get_string('key98', 'block_sibcms'));
         $myxls->write_number($index++, 1, $students_active);
 
         $myxls->write_string($index, 0, get_string('key99', 'block_sibcms'));
         $myxls->write_number($index++, 1, $graders_active);
+
+        foreach ($properties as $property) {
+            $myxls->write_string($index, 0, get_string('key63', 'block_sibcms') . ' ' . $property->name);
+            $myxls->write_number($index++, 1, $property->total);
+        }
 
     } else {
 

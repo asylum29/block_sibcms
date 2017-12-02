@@ -21,10 +21,6 @@
     background-color: rgb(230, 240, 230);
 }
 
-#block_sibcms .block_sibcms_lightyellow {
-    background-color: rgb(240, 240, 200);
-}
-
 #block_sibcms .block_sibcms_lightgray {
     background-color: rgb(235, 235, 235);
 }
@@ -52,7 +48,8 @@
     margin-top: 5px;
 }
 
-#block_sibcms .block_sibcms_monitoringtable > thead th.header {
+#block_sibcms .block_sibcms_monitoringtable > thead th.header,
+#block_sibcms .block_sibcms_formtable th.header {
     font-weight: bold;
     background-color: lightgray;
 }
@@ -95,11 +92,14 @@
     background-color: rgb(255, 221, 117);
 }
 
-#block_sibcms .block_sibcms_formtable th.header {
-    font-weight: bold;
-    background-color: lightgray;
-}
-
 #block_sibcms .block_sibcms_exportbtn {
     float: left;
+}
+
+#block_sibcms div.block_sibcms_props {
+    margin-bottom: 0;
+}
+
+#block_sibcms div.block_sibcms_feedback {
+    margin-top: 10px;
 }

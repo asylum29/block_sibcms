@@ -102,6 +102,9 @@ class form_assigns_data_table implements \renderable
             foreach ($feedbacks as $feedback) {
                 $feedbacks_names[] = $feedback->get_name();
             }
+            if (count($feedbacks_names) == 0) {
+                $feedbacks_names[] = get_string('key75', 'block_sibcms');
+            }
             $table_row_data[] = \html_writer::alist($feedbacks_names);
 
             $this->table_classes[] = !$assign->modvisible ? 'dimmed_text' : '';

@@ -9,8 +9,8 @@
                 <FIELD NAME="id" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="true"/>
                 <FIELD NAME="userid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
                 <FIELD NAME="courseid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
-                <FIELD NAME="result" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
                 <FIELD NAME="timecreated" TYPE="int" LENGTH="11" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
+                <FIELD NAME="result" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
                 <FIELD NAME="feedback" TYPE="char" LENGTH="1000" NOTNULL="false" SEQUENCE="false"/>
                 <FIELD NAME="comment" TYPE="char" LENGTH="1000" NOTNULL="false" SEQUENCE="false"/>
             </FIELDS>
@@ -47,7 +47,7 @@
         <TABLE NAME="block_sibcms_properties" COMMENT="">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="true"/>
-                <FIELD NAME="name" TYPE="char" LENGTH="1000" NOTNULL="false" SEQUENCE="false"/>
+                <FIELD NAME="name" TYPE="char" LENGTH="1000" NOTNULL="true" SEQUENCE="false"/>
                 <FIELD NAME="hidden" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false"/>
             </FIELDS>
             <KEYS>

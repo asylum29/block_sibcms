@@ -24,66 +24,63 @@
 
 require_once('../../config.php');
 
+$show       = optional_param('show', 0, PARAM_INT);
+$hide       = optional_param('hide', 0, PARAM_INT);
+$delete     = optional_param('delete', 0, PARAM_INT);
+$return_url = optional_param('returnurl', new moodle_url('/blocks/sibcms/properties.php'), PARAM_URL);
+
+$id = $show ? $show : ($hide ? $hide : $delete);
+
 $PAGE->set_url(new moodle_url('/blocks/sibcms/properties.php'));
 
 require_login(1);
 
-require_capability('block/sibcms:monitoring', context_system::instance());
+if (!is_siteadmin()) {
+    print_error('error');
+}
 
 $PAGE->set_heading(get_string('key105', 'block_sibcms'));
 $PAGE->navbar->ignore_active();
 $PAGE->navbar->add(get_string('key21', 'block_sibcms'), new moodle_url('/blocks/sibcms/category.php'));
-
 $PAGE->navbar->add(get_string('key105', 'block_sibcms'), new moodle_url('/blocks/sibcms/properties.php'));
+$PAGE->set_title(get_string('key105', 'block_sibcms'));
 
-
-$show = optional_param('show', 0, PARAM_INT);
-$hide = optional_param('hide', 0, PARAM_INT);
-$delete = optional_param('delete', 0, PARAM_INT);
-$id = $show ? $show : ($hide ? $hide : $delete);
-
-$name = optional_param('name', null, PARAM_TEXT);
-
-$return_url  = optional_param('returnurl',
-    new moodle_url('/blocks/sibcms/properties.php'), PARAM_URL);
-
-
+$mform = new \block_sibcms\property_form();
 $properties = \block_sibcms\sibcms_api::get_properties(false);
 
 if ($id) {
     if (!array_key_exists($id, $properties)) {
-        print_error('invalidargument');
+        print_error('error');
     }
 }
 
 if ($show && confirm_sesskey()) {
     if ($properties[$id]->hidden) {
-        $properties[$id]->hidden = 0;
-        $DB->update_record('block_sibcms_properties', $properties[$id]);
+        \block_sibcms\sibcms_api::set_propvisible($id, 0);
     }
     redirect($return_url);
 } else if ($hide && confirm_sesskey()) {
     if (!$properties[$id]->hidden) {
-        $properties[$id]->hidden = 1;
-        $DB->update_record('block_sibcms_properties', $properties[$id]);
+        \block_sibcms\sibcms_api::set_propvisible($id, 1);
     }
     redirect($return_url);
 } else if ($delete && confirm_sesskey()) {
     \block_sibcms\sibcms_api::delete_property($id);
     redirect($return_url);
-} else if ($name && confirm_sesskey()) {
-    \block_sibcms\sibcms_api::add_property($name);
+} else if ($data = $mform->get_data()) {
+    block_sibcms\sibcms_api::add_property($data->name);
     redirect($return_url);
 }
 
-
 $output = $PAGE->get_renderer('block_sibcms');
-
-$properties_table = new \block_sibcms\output\properties_table();
 
 echo $output->header();
 
-echo $output->render($properties_table);
-echo $output->display_property_create_form();
+if (count($properties) > 0) {
+    $properties_table = new \block_sibcms\output\properties_table($properties);
+    echo $output->render($properties_table);
+}
+
+$mform->display();
 
 echo $output->footer();
