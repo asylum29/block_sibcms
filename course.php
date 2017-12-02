@@ -88,7 +88,8 @@ if ($mform->is_cancelled()) {
         $data->id,
         $data->feedback,
         $data->comment,
-        $data->result
+        $data->result ? 0 : 1,
+        $data->properties
     );
     $event = \block_sibcms\event\comment_created::create(array('objectid' => $course_id, 'other' => array('category' => $category_id)));
     $event->trigger();
@@ -112,15 +113,20 @@ if ($mform->is_cancelled()) {
         'id'        => $course_id,
         'category'  => $category_id,
         'returnurl' => $return_url,
-        'result'    => '',
         'feedback'  => '',
         'comment'   => ''
     );
 
     if ($last_feedback) {
-        $params['result']   = $last_feedback->result;
         $params['feedback'] = $last_feedback->feedback;
         $params['comment']  = $last_feedback->comment;
+        $properties = array();
+        foreach ($last_feedback->properties as $property) {
+            $properties[$property->id] = 1;
+        }
+        $params['properties'] = $properties;
+        $params['result'] = $last_feedback->result ? 0 : 1;
+
     }
 
     $mform->set_data($params);

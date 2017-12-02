@@ -29,7 +29,7 @@ $hide = optional_param('hide', 0, PARAM_INT);
 $id = $show ? $show : $hide;
 
 $course = get_course($id);
-$course->category;
+
 $return_url  = optional_param('returnurl',
     new moodle_url('/blocks/sibcms/courses.php', array('category' => $course->category)), PARAM_URL);
 

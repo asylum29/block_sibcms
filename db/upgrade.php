@@ -54,5 +54,34 @@ function xmldb_block_sibcms_upgrade($oldversion) {
         }
     }
 
+    if ($oldversion < 2017120100) {
+        $sql = 'UPDATE {block_sibcms_feedbacks}
+                   SET result = 1
+                 WHERE result <> 0';
+        $DB->execute($sql);
+
+        $table1 = new xmldb_table('block_sibcms_properties');
+        $table1->add_field('id', XMLDB_TYPE_INTEGER, '11', XMLDB_UNSIGNED, XMLDB_NOTNULL, XMLDB_SEQUENCE);
+        $table1->add_field('name', XMLDB_TYPE_CHAR, '1000', null, XMLDB_NOTNULL);
+        $table1->add_field('hidden', XMLDB_TYPE_INTEGER, '1');
+        $table1->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        if (!$dbman->table_exists($table1)) {
+            $dbman->create_table($table1);
+        }
+
+        $table2 = new xmldb_table('block_sibcms_feedback_props');
+        $table2->add_field('id', XMLDB_TYPE_INTEGER, '11', XMLDB_UNSIGNED, XMLDB_NOTNULL, XMLDB_SEQUENCE);
+        $table2->add_field('feedbackid', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL);
+        $table2->add_field('propertyid', XMLDB_TYPE_INTEGER, '11', null, XMLDB_NOTNULL);
+        $table2->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table2->add_key('foreign1', XMLDB_KEY_FOREIGN, array('feedbackid'), 'block_sibcms_feedbacks', array('id'));
+        $table2->add_key('foreign2', XMLDB_KEY_FOREIGN, array('propertyid'), 'block_sibcms_properties', array('id'));
+        $table2->add_key('unique1', XMLDB_KEY_UNIQUE, array('feedbackid', 'propertyid'));
+        if (!$dbman->table_exists($table2)) {
+            $dbman->create_table($table2);
+        }
+
+    }
+
     return true;
 }

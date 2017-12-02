@@ -29,6 +29,8 @@ use block_sibcms\output\form_quiz_data_table;
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->libdir . '/formslib.php');
+
 class feedback_form extends \moodleform
 {
 
@@ -69,7 +71,7 @@ class feedback_form extends \moodleform
             $graders_str = \html_writer::start_tag('ul');
             foreach ($graders as $grader) {
                 $grader_link = \html_writer::link(
-                    new \moodle_url('/user/profile.php', array('id' => $grader->id)),
+                    new \moodle_url('/user/view.php', array('id' => $grader->id, 'course' => $course_data->id)),
                     fullname($grader));
                 $time_ago = get_string('never');
                 if ($grader->lastcourseaccess) {
@@ -149,21 +151,22 @@ class feedback_form extends \moodleform
 
         $mform->addElement('header', 'feedbackhdr',
             get_string('key87', 'block_sibcms'));
-        // Course status
-        $results = array();
-        $results['none'] = get_string('key31', 'block_sibcms');
-        $results[0] = get_string('key23', 'block_sibcms');
-        $results[1] = get_string('key24', 'block_sibcms');
-        $results[2] = get_string('key25', 'block_sibcms');
-        $results[3] = get_string('key26', 'block_sibcms');
+        $mform->setExpanded('feedbackhdr');
 
-        $select = $mform->addElement('select', 'result', get_string('key33', 'block_sibcms'), $results, null);
-        $mform->addRule('result', get_string('key30', 'block_sibcms'), 'numeric', null, 'server');
-        $mform->addRule('result', get_string('key30', 'block_sibcms'), 'required', null, 'server');
-        $select->setMultiple(false);
+        // Result
+        $mform->addElement('advcheckbox', 'result', '', get_string('key23', 'block_sibcms'),
+            array('group' => 1, 'class' => 'block_sibcms_props'), array(0, 1));
+
+        // Feedback properties
+        $properties = sibcms_api::get_properties();
+        foreach ($properties as $property) {
+            $mform->addElement('advcheckbox', 'properties[' . $property->id . ']', '', $property->name,
+                array('group' => 1, 'class' => 'block_sibcms_props'), array(0, 1));
+        }
 
         // Feedback textarea
-        $mform->addElement('textarea', 'feedback', get_string('key34', 'block_sibcms'), 'wrap="virtual" cols="50" rows="8"');
+        $mform->addElement('textarea', 'feedback', get_string('key34', 'block_sibcms'),
+            'wrap="virtual" cols="50" rows="8" class="block_sibcms_feedback"');
 
         // Comment textarea
         $mform->addElement('textarea', 'comment', get_string('key35', 'block_sibcms'), 'wrap="virtual" cols="50" rows="3"');

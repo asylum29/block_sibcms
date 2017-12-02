@@ -93,7 +93,6 @@ class renderer extends \plugin_renderer_base
                 '',
                 get_string('key10', 'block_sibcms'),
                 get_string('key11', 'block_sibcms'),
-                get_string('key12', 'block_sibcms'),
                 get_string('key13', 'block_sibcms')
             );
             $table->align[0] = 'center';
@@ -102,21 +101,6 @@ class renderer extends \plugin_renderer_base
                 $time_ago = get_string('never');
                 if (!empty($feedback)) {
                     $time_ago = format_time(time() - $feedback->timecreated);
-                }
-                $status = \html_writer::span(get_string('key75', 'block_sibcms'), 'red');
-                if ($feedback) {
-                    if ($feedback->result == 0) {
-                        $status = \html_writer::span(get_string('key23', 'block_sibcms'), 'green');
-                    }
-                    if ($feedback->result == 1) {
-                        $status = \html_writer::span(get_string('key24', 'block_sibcms'));
-                    }
-                    if ($feedback->result == 2) {
-                        $status = \html_writer::span(get_string('key25', 'block_sibcms'));
-                    }
-                    if ($feedback->result == 3) {
-                        $status = \html_writer::span(get_string('key26', 'block_sibcms'), 'red');
-                    }
                 }
 
                 $coursename = $course->fullname;
@@ -140,7 +124,6 @@ class renderer extends \plugin_renderer_base
                         \html_writer::span('!', 'bold red text-center') : '',
                     $coursename,
                     $time_ago,
-                    $status,
                     \html_writer::tag('a', get_string('key19', 'block_sibcms'),
                         array(
                             'href' => new \moodle_url('/blocks/sibcms/course.php', array(
@@ -206,6 +189,17 @@ class renderer extends \plugin_renderer_base
     public function render_activity_quiz_data_table(activity_quiz_data_table $widget) {
         $table = new \html_table();
         $table->attributes['class'] = 'generaltable block_sibcms_reporttable';
+        $table->head = $widget->table_head;
+        $table->size = $widget->table_size;
+        $table->data = $widget->table_data;
+        $table->rowclasses = $widget->table_classes;
+        $table_str = \html_writer::table($table);
+        return $table_str;
+    }
+
+    public function render_properties_table(properties_table $widget) {
+        $table = new \html_table();
+        $table->attributes['class'] = 'generaltable';
         $table->head = $widget->table_head;
         $table->size = $widget->table_size;
         $table->data = $widget->table_data;
@@ -371,16 +365,11 @@ class renderer extends \plugin_renderer_base
                     if ($feedback) {
                         if (trim($feedback->feedback) != '') {
                             $comment = $feedback->feedback . '<br />';
-                            $comment .= \html_writer::tag('i', get_string('key77', 'block_sibcms') . ':&nbsp;' . userdate($feedback->timecreated, '%d %b %Y, %H:%M'));
+                            $comment .= \html_writer::tag('i', get_string('key77', 'block_sibcms') . ':&nbsp;' . 
+                                userdate($feedback->timecreated, '%d %b %Y, %H:%M'));
                             $notices[] = $comment;
                         }
-                        if ($feedback->result == 0) {
-                            $class = 'block_sibcms_lightgreen';
-                        } else if ($feedback->result == 1) {
-                            $class = 'block_sibcms_lightyellow';
-                        } else {
-                            $class = 'block_sibcms_lightred';
-                        }
+                        $class = $feedback->result == 0 ? 'block_sibcms_lightgreen' : 'block_sibcms_lightred';
                     } else {
                         $notices[] = get_string('key76', 'block_sibcms');
                     }
