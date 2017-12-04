@@ -76,6 +76,9 @@ class form_quiz_data_table implements \renderable
             if (!$quiz->timelimit) {
                 $content .= $OUTPUT->pix_icon('notimelimit', get_string('key96', 'block_sibcms'), 'block_sibcms', array('class' => 'iconsmall'));
             }
+            if ($quiz->noquestions) {
+                $content .= $OUTPUT->pix_icon('noquestions', get_string('key74', 'block_sibcms'), 'block_sibcms', array('class' => 'iconsmall'));
+            }
             $table_row_data[] = $content;
 
             // Time limit
