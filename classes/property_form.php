@@ -22,20 +22,34 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die;
+namespace block_sibcms;
 
-if ($ADMIN->fulltree) {
+defined('MOODLE_INTERNAL') || die();
 
-    $name = get_string('key100', 'block_sibcms');
-    $description = get_string('key101', 'block_sibcms');
-    $settings->add(new admin_setting_configduration(
-        'block_sibcms/feedback_relevance_duration',
-        $name,
-        $description,
-        3 * 24 * 60 * 60 // 3 days
-    ));
+require_once($CFG->libdir . '/formslib.php');
 
-    $link = '<a href="'.$CFG->wwwroot.'/blocks/sibcms/properties.php">'.get_string('key105', 'block_sibcms').'</a>';
-    $settings->add(new admin_setting_heading('block_sibcms_properties', '', $link));
+class property_form extends \moodleform
+{
+
+    public function definition()
+    {
+        $mform = $this->_form;
+
+        $header = \html_writer::tag('h4', get_string('key104', 'block_sibcms'));
+        $mform->addElement('static', 'header', '', $header);
+
+        $mform->addElement('text', 'name', get_string('key102', 'block_sibcms'), array('size' => '50'));
+        $mform->setType('name', PARAM_NOTAGS);
+        $mform->addRule('name', get_string('required'), 'required', null, 'server');
+        $mform->addRule('name', get_string('error'), 'maxlength', 1000, 'server');
+
+        $this->add_action_buttons(false);
+    }
+
+    function validation($data, $files)
+    {
+        $errors = parent::validation($data, $files);
+        return $errors;
+    }
 
 }

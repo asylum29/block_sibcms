@@ -64,16 +64,15 @@ class sibcms_api
     public static function get_feedback_properties($feedback_id, $only_active = true)
     {
         global $DB;
-        $args = array($feedback_id);
         $sql = 'SELECT p.id, p.name
                   FROM {block_sibcms_feedback_props} fp
                   JOIN {block_sibcms_properties} p
                     ON fp.propertyid = p.id
-                 WHERE fp.feedbackid = ? ';
+                 WHERE fp.feedbackid = ?';
         if ($only_active) {
             $sql .= ' AND p.hidden = 0';
         }
-        return $DB->get_records_sql($sql, $args);
+        return $DB->get_records_sql($sql, array($feedback_id));
     }
 
     /**
@@ -84,11 +83,7 @@ class sibcms_api
     public static function get_properties($only_active = true)
     {
         global $DB;
-        $args = array();
-        if ($only_active) {
-            $args['hidden'] = 0;
-        }
-        return $DB->get_records('block_sibcms_properties', $args);
+        return $DB->get_records('block_sibcms_properties', $only_active ? array('hidden' => 0) : array());
     }
 
 
@@ -113,19 +108,19 @@ class sibcms_api
         $last_id = $DB->insert_record('block_sibcms_feedbacks', $record);
 
         $all_properties = \block_sibcms\sibcms_api::get_properties(false);
-
         foreach ($properties as $property_id => $value) {
             if ($value) {
                 if (!array_key_exists($property_id, $all_properties)) {
-                    print_error('invalidargument');
+                    print_error('error');
                 }
-
                 $record = new \stdClass();
                 $record->feedbackid = $last_id;
                 $record->propertyid = $property_id;
                 $DB->insert_record('block_sibcms_feedback_props', $record);
             }
         }
+
+        return $last_id;
     }
 
     /**
@@ -143,6 +138,19 @@ class sibcms_api
     }
 
     /**
+     * Add new property
+     * @param $name
+     */
+    public static function add_property($name)
+    {
+        global $DB;
+        $record = new \stdClass();
+        $record->name = $name;
+        $record->hidden = 0;
+        return $DB->insert_record('block_sibcms_properties', $record);
+    }
+
+    /**
      * Delte property
      * @param $property_id
      */
@@ -153,17 +161,14 @@ class sibcms_api
         $DB->delete_records('block_sibcms_properties', array('id' => $property_id));
     }
 
-    /**
-     * Add new property
-     * @param $name
-     */
-    public static function add_property($name)
+    public static function set_propvisible($property_id, $hidden)
     {
         global $DB;
-        $record = new \stdClass();
-        $record->name = $name;
-        $record->hidden = 0;
-        $DB->insert_record('block_sibcms_properties', $record);
+        $hidden = $hidden ? 1 : 0;
+        $exists = $DB->record_exists('block_sibcms_properties', array('id' => $property_id));
+        if ($exists) {
+            $DB->set_field('block_sibcms_properties', 'hidden', $hidden, array('id' => $property_id));
+        }
     }
 
     /**
@@ -360,7 +365,7 @@ class sibcms_api
      * @param bool $onlyvisible
      * @return array
      */
-    public static function get_assign_grades_data($modinfo, $activitygroup, $onlyvisible = false)
+    public static function get_assign_grades_data($modinfo, $activitygroup = 0, $onlyvisible = false)
     {
         global $DB;
 
@@ -419,7 +424,7 @@ class sibcms_api
                 $moddata->graded_persent = null;
                 // TODO: Decide whether to add participants to results
             } else { // Own calculation algorithm
-                list($esql, $uparams) = get_enrolled_sql($cm, 'mod/assign:submit', $activitygroup, 'u.*', null, null, null, true);
+                list($esql, $uparams) = get_enrolled_sql($cm, 'mod/assign:submit', $activitygroup, true);
                 $info = new \core_availability\info_module($module);
                 list($fsql, $fparams) = $info->get_user_list_sql(true);
                 if ($fsql) $uparams = array_merge($uparams, $fparams);
@@ -491,7 +496,7 @@ class sibcms_api
      * @param bool $onlyvisible
      * @return array
      */
-    public static function get_quiz_grades_data($modinfo, $activitygroup, $onlyvisible = false)
+    public static function get_quiz_grades_data($modinfo, $activitygroup = 0, $onlyvisible = false)
     {
         global $DB;
 
@@ -517,8 +522,7 @@ class sibcms_api
             $moddata->visible = has_capability('mod/quiz:view', $cm);
             $moddata->timelimit = $quiz->get_quiz()->timelimit;
 
-
-            list($esql, $uparams) = get_enrolled_sql($cm, 'mod/quiz:attempt', $activitygroup, 'u.*', null, null, null, true);
+            list($esql, $uparams) = get_enrolled_sql($cm, 'mod/quiz:attempt', $activitygroup, true);
             $info = new \core_availability\info_module($module);
             list($fsql, $fparams) = $info->get_user_list_sql(true);
             if ($fsql) $uparams = array_merge($uparams, $fparams);

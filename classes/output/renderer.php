@@ -208,19 +208,6 @@ class renderer extends \plugin_renderer_base
         return $table_str;
     }
 
-    public function display_property_create_form() {
-        $result = \html_writer::start_tag('form');
-        $result .= \html_writer::tag('h4', get_string('key104', 'block_sibcms'));
-        $result .= \html_writer::tag('input', '',
-            array('type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()));
-        $result .= \html_writer::tag('input', '',
-            array('type' => 'text', 'name' => 'name'));
-        $result .= \html_writer::tag('input', '',
-            array('type' => 'submit', 'name' => 'create'));
-        $result .= \html_writer::end_tag('form');
-        return $result;
-    }
-
     public function display_activity_report($course_id) {
         global $PAGE, $OUTPUT, $CFG;
 
@@ -378,16 +365,11 @@ class renderer extends \plugin_renderer_base
                     if ($feedback) {
                         if (trim($feedback->feedback) != '') {
                             $comment = $feedback->feedback . '<br />';
-                            $comment .= \html_writer::tag('i', get_string('key77', 'block_sibcms') . ':&nbsp;' . userdate($feedback->timecreated, '%d %b %Y, %H:%M'));
+                            $comment .= \html_writer::tag('i', get_string('key77', 'block_sibcms') . ':&nbsp;' . 
+                                userdate($feedback->timecreated, '%d %b %Y, %H:%M'));
                             $notices[] = $comment;
                         }
-                        if ($feedback->result == 0) {
-                            $class = 'block_sibcms_lightgreen';
-                        } else if ($feedback->result == 1) {
-                            $class = 'block_sibcms_lightyellow';
-                        } else {
-                            $class = 'block_sibcms_lightred';
-                        }
+                        $class = $feedback->result == 0 ? 'block_sibcms_lightgreen' : 'block_sibcms_lightred';
                     } else {
                         $notices[] = get_string('key76', 'block_sibcms');
                     }

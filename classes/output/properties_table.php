@@ -39,7 +39,7 @@ class properties_table implements \renderable
      * Quiz_data_table constructor.
      * @param $course_data
      */
-    public function __construct()
+    public function __construct($properties)
     {
         global $OUTPUT, $PAGE;
 
@@ -52,7 +52,6 @@ class properties_table implements \renderable
         $this->table_size = array('80%', '20%');
 
         $this->table_data = array();
-        $properties = sibcms_api::get_properties(false);
         foreach ($properties as $property) {
             $table_row_data = array();
             // Property name
@@ -87,7 +86,6 @@ class properties_table implements \renderable
             // Write data
             $this->table_data[] = $table_row_data;
         }
-
     }
 
 }
