@@ -113,19 +113,16 @@ class feedback_form extends \moodleform
             $course_changed = sibcms_api::course_was_changed($course_data);
             $course_changed_content = '';
             if ($course_changed === true) {
-                $course_changed_content = $OUTPUT->pix_icon('yes',
-                    get_string('key96', 'block_sibcms'),
-                    'block_sibcms', array()) . '&nbsp;' . get_string('yes');
+                $course_changed_content = $OUTPUT->pix_icon('yes', '',
+                    'block_sibcms') . '&nbsp;' . get_string('yes');
             }
             if ($course_changed === false) {
-                $course_changed_content = $OUTPUT->pix_icon('no',
-                        get_string('key96', 'block_sibcms'),
-                        'block_sibcms', array()) . '&nbsp;' . get_string('no');
+                $course_changed_content = $OUTPUT->pix_icon('no', '',
+                        'block_sibcms') . '&nbsp;' . get_string('no');
             }
             if ($course_changed === null) {
-                $course_changed_content = $OUTPUT->pix_icon('unknown',
-                        get_string('key96', 'block_sibcms'),
-                        'block_sibcms', array()) . '&nbsp;' . get_string('key107', 'block_sibcms');
+                $course_changed_content = $OUTPUT->pix_icon('unknown', '',
+                        'block_sibcms') . '&nbsp;' . get_string('key107', 'block_sibcms');
             }
             $mform->addElement('static', 'coursechanged',
                 get_string('key106', 'block_sibcms'),

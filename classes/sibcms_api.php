@@ -24,8 +24,6 @@
 
 namespace block_sibcms;
 
-use logstore_standard\log\store;
-
 defined('MOODLE_INTERNAL') || die;
 
 require_once($CFG->dirroot . '/mod/assign/locallib.php');
