@@ -363,8 +363,9 @@ class sibcms_api
      */
     public static function course_was_changed($course_data)
     {
-        $loglifetime = get_config('logstore_standard', 'loglifetime') * 24 * 60 * 60;
         $last_feedback = sibcms_api::get_last_course_feedback($course_data->id);
+        if (!$last_feedback) return null;
+        $loglifetime = get_config('logstore_standard', 'loglifetime') * 24 * 60 * 60;
         $feedback_time = time() - $last_feedback->timecreated;
         if ($loglifetime > 0 && $feedback_time > $loglifetime) return null;
 
