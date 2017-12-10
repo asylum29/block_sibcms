@@ -400,7 +400,7 @@ class renderer extends \plugin_renderer_base
 
                     $content = \html_writer::start_div('block_sibcms_coursestats');
                     if (count($hints) > 0) {
-                        $content .= \html_writer::div(get_string('key29', 'block_sibcms') . ':', 'block_sibcms_modheader');
+                        $content .= \html_writer::div(get_string('key109', 'block_sibcms') . ':', 'block_sibcms_modheader');
                         $content .= \html_writer::alist($hints, array('class' => 'block_sibcms_hints'));
                     }
                     if (count($course_data->assigns) > 0) {

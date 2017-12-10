@@ -96,7 +96,7 @@ class feedback_form extends \moodleform
             $hints_str .= get_string('key58', 'block_sibcms');
         }
         $mform->addElement('static', 'autohints',
-            get_string('key29', 'block_sibcms'),
+            get_string('key109', 'block_sibcms'),
             $hints_str
         );
 
