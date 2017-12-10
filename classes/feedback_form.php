@@ -36,7 +36,7 @@ class feedback_form extends \moodleform
 
     public function definition()
     {
-        global $PAGE;
+        global $PAGE, $OUTPUT;
         $mform = $this->_form;
         $course_data = $this->_customdata['course_data'];
         $last_feedback = $this->_customdata['last_feedback'];
@@ -96,7 +96,7 @@ class feedback_form extends \moodleform
             $hints_str .= get_string('key58', 'block_sibcms');
         }
         $mform->addElement('static', 'autohints',
-            get_string('key29', 'block_sibcms'),
+            get_string('key109', 'block_sibcms'),
             $hints_str
         );
 
@@ -107,6 +107,28 @@ class feedback_form extends \moodleform
                 userdate($last_feedback->timecreated) . '&nbsp;(' . format_time(time() - $last_feedback->timecreated) . ')' :
                     get_string('never')
         );
+
+        // Course changed
+        if ($last_feedback) {
+            $course_changed = sibcms_api::course_was_changed($course_data);
+            $course_changed_content = '';
+            if ($course_changed === true) {
+                $course_changed_content = $OUTPUT->pix_icon('yes', '',
+                    'block_sibcms') . '&nbsp;' . get_string('yes');
+            }
+            if ($course_changed === false) {
+                $course_changed_content = $OUTPUT->pix_icon('no', '',
+                        'block_sibcms') . '&nbsp;' . get_string('no');
+            }
+            if ($course_changed === null) {
+                $course_changed_content = $OUTPUT->pix_icon('unknown', '',
+                        'block_sibcms') . '&nbsp;' . get_string('key107', 'block_sibcms');
+            }
+            $mform->addElement('static', 'coursechanged',
+                get_string('key106', 'block_sibcms'),
+                $course_changed_content
+            );
+        }
 
         $assigns = $course_data->assigns;
         $quiz = $course_data->quiz;
