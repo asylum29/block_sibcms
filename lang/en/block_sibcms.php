@@ -118,4 +118,5 @@ $string['key104'] = 'Add new property';
 $string['key105'] = 'Course properties';
 $string['key106'] = 'Course was changed';
 $string['key107'] = 'Unknown';
-$string['key108'] = 'RUCONTEXT enabled';
+$string['key108'] = 'Plagiarism plugin enabled';
+$string['key109'] = 'Founded errors'; //CHECK
