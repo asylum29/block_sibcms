@@ -359,6 +359,94 @@ class sibcms_api
     }
 
     /**
+     * Check if course has changed since last feedback
+     */
+    public static function course_was_changed($course_data)
+    {
+        $last_feedback = sibcms_api::get_last_course_feedback($course_data->id);
+        if (!$last_feedback) {
+            return null;
+        }
+
+        $loglifetime = get_config('logstore_standard', 'loglifetime') * 24 * 60 * 60;
+        $feedback_time = time() - $last_feedback->timecreated;
+        if ($loglifetime > 0 && $feedback_time > $loglifetime) {
+            return null;
+        }
+
+        $global_event_names = array(
+            '\\\\core\\\\event\\\\course_module_created',
+            '\\\\core\\\\event\\\\course_module_updated',
+            '\\\\core\\\\event\\\\course_module_deleted',
+            '\\\\core\\\\event\\\\course_reset_started',
+            '\\\\core\\\\event\\\\course_reset_ended',
+            '\\\\core\\\\event\\\\course_restored',
+            '\\\\core\\\\event\\\\course_section_updated',
+            '\\\\core\\\\event\\\\course_section_deleted',
+            '\\\\core\\\\event\\\\course_updated',
+            '\\\\core\\\\event\\\\enrol_instance_created',
+            '\\\\core\\\\event\\\\enrol_instance_updated',
+            '\\\\core\\\\event\\\\enrol_instance_deleted',
+            '\\\\core\\\\event\\\\group_created',
+            '\\\\core\\\\event\\\\group_updated',
+            '\\\\core\\\\event\\\\group_deleted',
+            '\\\\core\\\\event\\\\grouping_created',
+            '\\\\core\\\\event\\\\grouping_deleted',
+            '\\\\core\\\\event\\\\grouping_group_assigned',
+            '\\\\core\\\\event\\\\grouping_group_unassigned',
+            '\\\\core\\\\event\\\\grouping_updated',
+        );
+        $graders_event_names = array(
+            '\\\\core\\\\event\\\\group_member_added',
+            '\\\\core\\\\event\\\\group_member_removed',
+            '\\\\core\\\\event\\\\role_assigned',
+            '\\\\core\\\\event\\\\role_unassigned',
+            '\\\\core\\\\event\\\\user_enrolment_created',
+            '\\\\core\\\\event\\\\user_enrolment_updated',
+            '\\\\core\\\\event\\\\user_enrolment_deleted',
+            '\\\\core\\\\event\\\\user_graded',
+            '\\\\core\\\\event\\\\grade_deleted',
+        );
+
+        $where = "courseid = ? AND timecreated > ?";
+        $global_where = '(';
+        for ($i = 0; $i < count($global_event_names); $i++) {
+            $eventname = $global_event_names[$i];
+            if ($i == 0) {
+                $global_where .= "eventname = '$eventname'";
+            } else {
+                $global_where .= " OR eventname = '$eventname'";
+            }
+        }
+        $global_where .= ')';
+
+        if (count($course_data->graders)) {
+            $graders_where = '((';
+            for ($i = 0; $i < count($graders_event_names); $i++) {
+                $eventname = $graders_event_names[$i];
+                $graders_where .= $i == 0 ? "eventname = '$eventname'" : " OR eventname = '$eventname'";
+            }
+            $graders_where .= ') AND (';
+            for ($i = 0; $i < count($course_data->graders); $i++) {
+                $graders_where .= $i == 0 ? "userid = ?" : " OR userid = ?";
+            }
+            $graders_where .= '))';
+            $where .= " AND ($global_where OR $graders_where)";
+        } else {
+            $where .= " AND $global_where";
+        }
+
+        $params = array($course_data->id, $last_feedback->timecreated);
+        $graders_ids = array_map(function($grader) { return $grader->id; }, $course_data->graders);
+        $params = array_merge($params, $graders_ids);
+        $store = new \logstore_standard\log\store(new \tool_log\log\manager());
+        $count = $store->get_events_select_count($where, $params);
+
+        return $count > 0;
+    }
+
+
+    /**
      * Get assings data
      * @param $modinfo
      * @param $activitygroup
@@ -479,8 +567,17 @@ class sibcms_api
 
             }
 
-            $data[$module->id] = $moddata;
+            // Plagiarism check
+            $moddata->plagiarism = false;
+            $plagiarism_plugins = \core_component::get_plugin_list('plagiarism');
+            if (isset($plagiarism_plugins['rucontext'])) {
+                $rucontext_record = $DB->get_record('plagiarism_rucontext_mod_en', array('moduleid' => $module->id));
+                if ($rucontext_record && $rucontext_record->enable == 1) {
+                    $moddata->plagiarism = true;
+                }
+            }
 
+            $data[$module->id] = $moddata;
         }
 
         $results->submitted_persent = $results->participants > 0 ? $results->submitted / $results->participants : 0;

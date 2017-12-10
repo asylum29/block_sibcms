@@ -83,6 +83,9 @@ class activity_assigns_data_table implements \renderable
             if ($assign->teamsubmission) {
                 $content .= $OUTPUT->pix_icon('i/users', get_string('key73', 'block_sibcms'), '', array('class' => 'iconsmall'));
             }
+            if ($assign->plagiarism) {
+                $content .= $OUTPUT->pix_icon('plagiarism', get_string('key108', 'block_sibcms'), 'block_sibcms', array('class' => 'iconsmall'));
+            }
             $table_row_data[] = $content;
 
             $table_row_data[] = $assign->teamsubmission ? '—' : $assign->participants;
