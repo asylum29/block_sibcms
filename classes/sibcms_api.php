@@ -404,6 +404,8 @@ class sibcms_api
             '\\\\core\\\\event\\\\user_enrolment_created',
             '\\\\core\\\\event\\\\user_enrolment_updated',
             '\\\\core\\\\event\\\\user_enrolment_deleted',
+        );
+        $graders_event_names_grades = array(
             '\\\\core\\\\event\\\\user_graded',
             '\\\\core\\\\event\\\\grade_deleted',
         );
@@ -412,37 +414,54 @@ class sibcms_api
         $global_where = '(';
         for ($i = 0; $i < count($global_event_names); $i++) {
             $eventname = $global_event_names[$i];
-            if ($i == 0) {
-                $global_where .= "eventname = '$eventname'";
-            } else {
-                $global_where .= " OR eventname = '$eventname'";
-            }
+            $global_where .= $i == 0 ? "eventname = '$eventname'" : " OR eventname = '$eventname'";
         }
         $global_where .= ')';
 
-        if (count($course_data->graders)) {
-            $graders_where = '((';
+        $grades_where = '';
+        $graders_where = '';
+        if (count($course_data->graders) > 0) {
+            $grades_where = $graders_where = '((';
+            for ($i = 0; $i < count($graders_event_names_grades); $i++) {
+                $eventname = $graders_event_names_grades[$i];
+                $grades_where .= $i == 0 ? "eventname = '$eventname'" : " OR eventname = '$eventname'";
+            }
             for ($i = 0; $i < count($graders_event_names); $i++) {
                 $eventname = $graders_event_names[$i];
                 $graders_where .= $i == 0 ? "eventname = '$eventname'" : " OR eventname = '$eventname'";
             }
+            $grades_where .= ') AND (';
             $graders_where .= ') AND (';
+            $graders_users_where = '';
             for ($i = 0; $i < count($course_data->graders); $i++) {
-                $graders_where .= $i == 0 ? "userid = ?" : " OR userid = ?";
+                $graders_users_where .= $i == 0 ? "userid = ?" : " OR userid = ?";
             }
-            $graders_where .= '))';
-            $where .= " AND ($global_where OR $graders_where)";
-        } else {
-            $where .= " AND $global_where";
+            $grades_where .= ($graders_users_where . '))');
+            $graders_where .= ($graders_users_where . '))');
         }
 
+        $changes = array();
         $params = array($course_data->id, $last_feedback->timecreated);
         $graders_ids = array_map(function($grader) { return $grader->id; }, $course_data->graders);
         $params = array_merge($params, $graders_ids);
         $store = new \logstore_standard\log\store(new \tool_log\log\manager());
-        $count = $store->get_events_select_count($where, $params);
 
-        return $count > 0;
+        $result_where = $where;
+        $result_where .= count($course_data->graders) > 0 ?
+            " AND ($global_where OR $graders_where)" : " AND $global_where";
+        $count = $store->get_events_select_count($result_where, $params);
+        if ($count > 0) {
+            $changes[] = get_string('key110', 'block_sibcms');
+        }
+
+        if (count($course_data->graders) > 0) {
+            $count = $store->get_events_select_count($where . " AND $grades_where", $params);
+            if ($count > 0) {
+                $changes[] = get_string('key111', 'block_sibcms');
+            }
+        }
+
+        return $changes;
     }
 
 

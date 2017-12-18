@@ -110,19 +110,18 @@ class feedback_form extends \moodleform
 
         // Course changed
         if ($last_feedback) {
-            $course_changed = sibcms_api::course_was_changed($course_data);
-            $course_changed_content = '';
-            if ($course_changed === true) {
-                $course_changed_content = $OUTPUT->pix_icon('yes', '',
-                    'block_sibcms') . '&nbsp;' . get_string('yes');
-            }
-            if ($course_changed === false) {
-                $course_changed_content = $OUTPUT->pix_icon('no', '',
-                        'block_sibcms') . '&nbsp;' . get_string('no');
-            }
-            if ($course_changed === null) {
+            $course_changes = sibcms_api::course_was_changed($course_data);
+            if ($course_changes === null) {
                 $course_changed_content = $OUTPUT->pix_icon('unknown', '',
                         'block_sibcms') . '&nbsp;' . get_string('key107', 'block_sibcms');
+            } else if (count($course_changes) === 0) {
+                $course_changed_content = $OUTPUT->pix_icon('no', '',
+                        'block_sibcms') . '&nbsp;' . get_string('no');
+            } else {
+                $course_changed_content = $OUTPUT->pix_icon('yes', '',
+                        'block_sibcms') . '&nbsp;' . get_string('yes');
+                $course_changes_str = implode($course_changes, '; ');
+                $course_changed_content .= '&nbsp;(' . \core_text::strtolower($course_changes_str) . ')';
             }
             $mform->addElement('static', 'coursechanged',
                 get_string('key106', 'block_sibcms'),
